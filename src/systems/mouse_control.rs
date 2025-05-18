@@ -1,3 +1,4 @@
+use bevy::ecs::system::command;
 use bevy::{prelude::*, render::camera};
 
 use crate::config::GameConfig;
@@ -11,15 +12,12 @@ pub fn handle_clicks(
     camera_query: Single<(&camera::Camera, &GlobalTransform)>,
     tiles: Query<(&GridPosition, &Transform), With<Tile>>,
     game_config: Res<GameConfig>,
-    mut spawn_plant_writer: EventWriter<SpawnPlantEvent>,
-    mut despawn_plant_writer: EventWriter<DespawnPlantEvent>,
+    spawn_plant_writer: EventWriter<SpawnPlantEvent>,
+    despawn_plant_writer: EventWriter<DespawnPlantEvent>,
 ) {
     if !mouse.just_pressed(MouseButton::Left) && !mouse.just_pressed(MouseButton::Right) {
         return;
     }
-    // if !mouse.just_pressed(MouseButton::Right) {
-    //     return;
-    // }
     let (camera, camera_transform) = camera_query.into_inner();
     let Some(cursor_position) = window.cursor_position() else {
         return;
@@ -29,13 +27,25 @@ pub fn handle_clicks(
         .unwrap()
         .origin;
 
-    // info!("cursor_position: {:?}", cursor_position);
-    // info!("world_pos: {:?}", world_position);
+    plant_click(game_config, tiles, world_position, mouse, spawn_plant_writer, despawn_plant_writer);
 
+    // todo: 处理阳光点击事件
+    // todo: 处理工具点击
+}
+
+/// 处理传给植物的点击事件
+fn plant_click(
+    game_config: Res<GameConfig>,
+    tiles: Query<(&GridPosition, &Transform), With<Tile>>,
+    click_world_position: Vec3,
+    mouse: Res<ButtonInput<MouseButton>>,
+    mut spawn_plant_writer: EventWriter<SpawnPlantEvent>,   
+    mut despawn_plant_writer: EventWriter<DespawnPlantEvent>,
+) {
     let tile_size = game_config.tile_size;
     for (grid_position, transform) in tiles.iter() {
-        let dx = (world_position.x - transform.translation.x).abs();
-        let dy = (world_position.y - transform.translation.y).abs();
+        let dx = (click_world_position.x - transform.translation.x).abs();
+        let dy = (click_world_position.y - transform.translation.y).abs();
         if dx < tile_size / 2.0 && dy < tile_size / 2.0 {
             if mouse.just_pressed(MouseButton::Left) {
                 // Spawn plant event

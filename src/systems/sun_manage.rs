@@ -103,8 +103,6 @@ fn sun_produce_sun(
     }
 }
 
-fn sun_cost(
-    mut sun_amount: ResMut<SunAmount>,
-) {
-
+fn sun_add(mut sun_amount: SunAmount, sun: u32) {
+    sun_amount.add(sun);
 }
