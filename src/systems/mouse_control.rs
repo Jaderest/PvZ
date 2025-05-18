@@ -1,8 +1,8 @@
-use bevy::{ecs::world, prelude::*, render::camera, winit::cursor};
+use bevy::{prelude::*, render::camera};
 
 use crate::config::GameConfig;
 use crate::model::{components::GridPosition, tile::Tile};
-use crate::systems::plant_events::*;
+use crate::model::plant_events::*;
 
 // 检测点击事件
 pub fn handle_clicks(

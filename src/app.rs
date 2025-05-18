@@ -6,6 +6,7 @@ use crate::systems::lawn::setup_lawn;
 use crate::config::*;
 use crate::systems::mouse_control::handle_clicks;
 use crate::systems::plant_manage::PlantPlugin;
+use crate::systems::sun_manage::SunPlugin;
 
 pub fn run() {
     App::new()
@@ -13,6 +14,7 @@ pub fn run() {
         .insert_resource(Lawn::default())
         .add_plugins(ConfigPlugin)
         .add_plugins(PlantPlugin)
+        .add_plugins(SunPlugin)
         .add_systems(Startup, setup_camera)
         .add_systems(Startup, setup_lawn)
         .add_systems(Update, handle_clicks)

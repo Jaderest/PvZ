@@ -1,4 +1,6 @@
-use bevy::prelude::*;
+use bevy::{platform::collections::HashMap, prelude::*};
+
+use crate::config::PlantType;
 
 /// 植物标记组件
 #[derive(Component)]
@@ -27,3 +29,16 @@ pub struct Sunflower {
 
 #[derive(Component)]
 pub struct WallNut;
+
+#[derive(Resource)]
+pub struct PlantCost(pub HashMap<PlantType, u32>);
+
+impl Default for PlantCost {
+    fn default() -> Self {
+        let mut cost = HashMap::new();
+        cost.insert(PlantType::PeaShooter, 100);
+        cost.insert(PlantType::Sunflower, 50);
+        cost.insert(PlantType::WallNut, 50);
+        Self(cost)
+    }
+}

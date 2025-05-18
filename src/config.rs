@@ -1,4 +1,4 @@
-use bevy::prelude::*;
+use bevy::{ecs::system::command::insert_resource, prelude::*};
 
 pub struct ConfigPlugin;
 impl Plugin for ConfigPlugin {
@@ -6,11 +6,14 @@ impl Plugin for ConfigPlugin {
         app.insert_resource(GameConfig::default())
             .insert_resource(GameType::default())
             .insert_resource(ControlState::default())
-            .insert_resource(PlantType::default());
+            .insert_resource(PlantType::default())
+            .insert_resource(WindowResolution::default())
+            .add_systems(Startup, setup_window_size);
+        //TODO: 设定一下window size
     }
 }
 
-#[derive(Resource)]
+#[derive(Resource, Clone, Copy)]
 enum GameType {
     DayTimeGrass,
     NightTimeGrass,
@@ -39,7 +42,7 @@ impl Default for ControlState {
     }
 }
 
-#[derive(Resource, Clone, Copy)]
+#[derive(Resource, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum PlantType {
     /// 豌豆射手
     PeaShooter,
@@ -55,6 +58,22 @@ impl Default for PlantType {
 }
 
 #[derive(Resource)]
+struct WindowResolution {
+    large: Vec2,
+    medium: Vec2,
+    small: Vec2,
+}
+impl Default for WindowResolution {
+    fn default() -> Self {
+        Self {
+            large: Vec2::new(1920.0, 1080.0),
+            medium: Vec2::new(1280.0, 720.0),
+            small: Vec2::new(800.0, 600.0),
+        }
+    }
+}
+
+#[derive(Resource, Clone, Copy)]
 pub struct GameConfig {
     pub tile_size: f32,
     pub map_width: u32,
@@ -71,5 +90,27 @@ impl Default for GameConfig {
             map_height: 5,
             game_type: GameType::default(),
         }
+    }
+}
+
+fn setup_window_size(mut window: Single<&mut Window>, resolution: Res<WindowResolution>) {
+    let res = resolution.medium;
+    window.resolution.set(res.x, res.y);
+    window.resizable = false;
+    window.name = Some("PvZ Rust Bevy Ver.".to_string());
+    window.resolution.set_scale_factor(1.2);
+}
+
+pub fn grid2pixel(game_config: GameConfig, grid_x: f32, gird_y: f32, z: f32) -> Vec3 {
+    let tile_size = game_config.tile_size;
+    let lawn_width = game_config.map_width as f32 * tile_size;
+    let bottom_edge_of_tile = -tile_size * (game_config.map_height as f32 - 2.0);
+    let left_edge_of_tile = 0.0 - lawn_width / 2.0;
+    let offset_x = left_edge_of_tile + tile_size / 2.0;
+    let offset_y = bottom_edge_of_tile + tile_size / 2.0;
+    Vec3 {
+        x: offset_x + (grid_x * tile_size),
+        y: offset_y + (gird_y * tile_size),
+        z,
     }
 }

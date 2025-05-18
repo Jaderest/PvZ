@@ -1,20 +1,23 @@
 use bevy::prelude::*;
 
+use crate::model::plant::PlantCost;
 use crate::model::tile::Lawn;
 
 use crate::config::GameConfig;
 use crate::config::PlantType;
 use crate::model::components::GridPosition;
 use crate::model::tile::{Child, Tile};
-use crate::systems::plant_events::*;
+use crate::model::plant_events::*;
 
 pub struct PlantPlugin;
 impl Plugin for PlantPlugin {
     fn build(&self, app: &mut App) {
         // 添加event
         // 添加系统
-        app.add_event::<SpawnPlantEvent>()
+        app.insert_resource(PlantCost::default())
+            .add_event::<SpawnPlantEvent>()
             .add_event::<DespawnPlantEvent>()
+            .add_event::<SuccessSpawnPlantEvent>()
             .add_systems(Update, spawn_plant)
             .add_systems(Update, despawn_plant);
     }
@@ -43,6 +46,8 @@ fn spawn_plant(
                 }
 
                 info!("Spawn plant at: {:?}", grid_position);
+
+                // 这里需要根据植物类型来判断阳光的消耗
 
                 let plant_entity = match *plant_type {
                     PlantType::PeaShooter => commands

@@ -8,6 +8,11 @@ pub struct SpawnPlantEvent {
 }
 
 #[derive(Event, Debug)]
+pub struct SuccessSpawnPlantEvent {
+    pub sun_cost: u32,
+}
+
+#[derive(Event, Debug)]
 pub struct DespawnPlantEvent {
     pub grid_position: GridPosition,
 }
