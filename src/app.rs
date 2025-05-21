@@ -7,6 +7,7 @@ use crate::config::*;
 use crate::systems::mouse_control::handle_clicks;
 use crate::systems::plant_manage::PlantPlugin;
 use crate::systems::sun_manage::SunPlugin;
+use crate::view::pvz_ui::*;
 
 pub fn run() {
     App::new()
@@ -15,6 +16,7 @@ pub fn run() {
         .add_plugins(ConfigPlugin)
         .add_plugins(PlantPlugin)
         .add_plugins(SunPlugin)
+        .add_plugins(MyUIPlugin)
         .add_systems(Startup, setup_camera)
         .add_systems(Startup, setup_lawn)
         .add_systems(Update, handle_clicks)

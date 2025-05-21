@@ -41,7 +41,7 @@ impl SunAmount {
 pub struct GlobalSunTimer(Timer);
 impl Default for GlobalSunTimer {
     fn default() -> Self {
-        Self(Timer::from_seconds(1.0, TimerMode::Repeating))
+        Self(Timer::from_seconds(10.0, TimerMode::Repeating))
     }
 }
 

@@ -28,7 +28,7 @@ impl Default for GameType {
 }
 
 #[derive(Resource)]
-enum ControlState {
+pub enum ControlState {
     /// 可以点击阳光，可以点击种子，可以点击工具
     Normal,
     /// 选择植物
@@ -53,7 +53,7 @@ pub enum PlantType {
 }
 impl Default for PlantType {
     fn default() -> Self {
-        Self::PeaShooter
+        Self::Sunflower
     }
 }
 
@@ -78,8 +78,8 @@ pub struct GameConfig {
     pub tile_size: f32,
     pub map_width: u32,
     pub map_height: u32,
-    /// 用以生成地图
-    pub game_type: GameType,
+    pub sun_size: f32,
+    // 用以生成地图
 }
 
 impl Default for GameConfig {
@@ -88,7 +88,8 @@ impl Default for GameConfig {
             tile_size: 128.0,
             map_width: 9,
             map_height: 5,
-            game_type: GameType::default(),
+            sun_size: 64.0,
+            // game_type: GameType::default(),
         }
     }
 }

@@ -10,21 +10,21 @@ pub struct Plant;
 #[derive(Component)]
 pub struct PlantHealth {
     /// 当前血量
-    current: f32,
+    pub current: f32,
     /// 最大血量
-    max: f32,
+    pub max: f32,
 }
 
 #[derive(Component)]
 pub struct PeaShooter {
-    damage: f32,
-    fire_interval: Timer,
+    pub damage: f32,
+    pub fire_interval: Timer,
 }
 
 #[derive(Component)]
 pub struct Sunflower {
-    sun_amount: u32,
-    interval: Timer,
+    pub sun_amount: u32,
+    pub interval: Timer,
 }
 
 #[derive(Component)]
@@ -32,7 +32,6 @@ pub struct WallNut;
 
 #[derive(Resource)]
 pub struct PlantCost(pub HashMap<PlantType, u32>);
-
 impl Default for PlantCost {
     fn default() -> Self {
         let mut cost = HashMap::new();

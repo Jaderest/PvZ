@@ -1,5 +1,6 @@
 mod app;
 mod model;
+mod view;
 mod systems;
 mod config;
 

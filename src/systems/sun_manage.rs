@@ -1,7 +1,4 @@
-use std::ops::Add;
-
 use bevy::prelude::*;
-use rand::rng;
 use rand::Rng;
 
 use crate::config::*;
@@ -18,55 +15,11 @@ impl Plugin for SunPlugin {
         // todo：注册生成阳光
         app.insert_resource(GlobalSunTimer::default())
             .insert_resource(SunAmount::default())
-            .add_systems(Startup, setup_sun_ui)
-            .add_systems(Update, update_sun_ui)
+            .add_event::<PickupSunEvent>()
             .add_systems(Update, sun_produce_sun)
+            .add_systems(Update, sun_add)
             ;
     }
-}
-
-/// Sun UI
-fn setup_sun_ui(
-    mut commands: Commands,
-    asset_server: Res<AssetServer>
-) {
-    commands.spawn((
-        Text::new("Sun: "),
-        TextFont {
-            font_size: 33.0,
-            ..default()
-        },
-        TextColor(Color::srgb(0.5, 0.5, 1.0)),
-        // TODO:　研究一下UI怎么用图片
-        // Sprite {
-        //     image: asset_server.load("Simple/Sun.png"),
-        //     // Only specify fields you want to override, the rest will use default values
-        //     ..default()
-        // },
-        SunUI,
-        Node {
-            position_type: PositionType::Absolute,
-            top: Val::Px(5.0),
-            left: Val::Px(5.0),
-            ..default()
-        },
-        children![(
-            TextSpan::default(),
-            TextFont {
-                font_size: 33.0,
-                ..default()
-            },
-            TextColor(Color::srgb(1.0, 0.5, 0.5)),
-        )],
-    ));
-}
-
-fn update_sun_ui(
-    sun_amount: Res<SunAmount>,
-    sun_root: Single<Entity, (With<SunUI>, With<Text>)>,
-    mut writer: TextUiWriter,
-) {
-    *writer.text(*sun_root, 1) = sun_amount.to_string();
 }
 
 /// 自然生成阳光
@@ -83,7 +36,6 @@ fn sun_produce_sun(
     if timer.just_finished() {
         // sun_amount.add(25);
         // info!("Sun amount: {}", sun_amount.get());
-        //TODO：生成实体
         let x: f32 = rng.random_range(0.0..8.0);
         let y: f32 = rng.random_range(0.0..4.0);
         let sun_position = grid2pixel(*game_config, x, y, 2.0);
@@ -103,6 +55,13 @@ fn sun_produce_sun(
     }
 }
 
-fn sun_add(mut sun_amount: SunAmount, sun: u32) {
-    sun_amount.add(sun);
+fn sun_add(mut sun_amount: ResMut<SunAmount>, mut pickup_sun_reader: EventReader<PickupSunEvent>) {
+    for event in pickup_sun_reader.read() {
+        sun_amount.add(event.amount);
+        info!("Sun amount: {}", sun_amount.get());
+    }
 }
+
+// fn sun_consume(mut sun_amount: SunAmount, sun: u32) {
+//     sun_amount.sub(sun);
+// }
