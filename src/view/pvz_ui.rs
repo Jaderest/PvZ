@@ -8,7 +8,6 @@ pub struct SunBankUI;
 #[derive(Component)]
 pub struct SunBankText;
 
-
 pub struct MyUIPlugin;
 impl Plugin for MyUIPlugin {
     fn build(&self, app: &mut App) {
@@ -21,8 +20,8 @@ fn setup_bank_ui(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands
         .spawn(Node {
             display: Display::Grid,
-            width: Val::Percent(60.0),
-            height: Val::Percent(20.0),
+            width: Val::Percent(50.0),
+            height: Val::Percent(15.0),
 
             grid_template_columns: vec![GridTrack::min_content(); 5],
             grid_template_rows: vec![GridTrack::min_content(); 1],
@@ -88,12 +87,10 @@ fn setup_bank_ui(mut commands: Commands, asset_server: Res<AssetServer>) {
         });
 }
 
-
 fn update_sun_bank_ui(
     sun_amount: Res<SunAmount>,
-    mut sun_bank_ui: Query<&mut Text, With<SunBankText>>,
+    sun_bank_ui: Single<&mut Text, With<SunBankText>>,
 ) {
-    for mut text in sun_bank_ui.iter_mut() {
-        **text = sun_amount.get().to_string();
-    }
+    let mut text = sun_bank_ui.into_inner();
+    **text = sun_amount.get().to_string();
 }

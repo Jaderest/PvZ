@@ -20,17 +20,34 @@ pub struct PeaShooter {
     pub damage: f32,
     pub fire_interval: Timer,
 }
+impl Default for PeaShooter {
+    fn default() -> Self {
+        Self {
+            damage: 10.0,
+            fire_interval: Timer::from_seconds(1.0, TimerMode::Repeating),
+        }
+    }
+    
+}
 
 #[derive(Component)]
 pub struct Sunflower {
     pub sun_amount: u32,
     pub interval: Timer,
 }
+impl Default for Sunflower {
+    fn default() -> Self {
+        Self {
+            sun_amount: 25,
+            interval: Timer::from_seconds(20.0, TimerMode::Repeating),
+        }
+    }
+}
 
 #[derive(Component)]
 pub struct WallNut;
 
-#[derive(Resource)]
+#[derive(Resource, Deref, DerefMut)]
 pub struct PlantCost(pub HashMap<PlantType, u32>);
 impl Default for PlantCost {
     fn default() -> Self {
@@ -41,3 +58,45 @@ impl Default for PlantCost {
         Self(cost)
     }
 }
+
+#[derive(Component)]
+pub struct UiTimer {
+    pub timer: Timer,
+    pub index: usize,
+    pub max_index: usize,
+}
+
+impl Default for UiTimer {
+    fn default() -> Self {
+        Self {
+            timer: Timer::from_seconds(0.1, TimerMode::Repeating),
+            index: 0,
+            max_index: 0,
+        }
+    }
+}
+impl UiTimer {
+    pub fn new(max_index: usize) -> Self {
+        Self {
+            timer: Timer::from_seconds(0.08, TimerMode::Repeating),
+            index: 0,
+            max_index,
+        }
+    }
+}
+
+// #[derive(Component, Deref, DerefMut)]
+// pub struct PeashooterUiTimer(pub Timer);
+// impl Default for PeashooterUiTimer {
+//     fn default() -> Self {
+//         Self(Timer::from_seconds(0.1, TimerMode::Repeating))
+//     }
+// }
+
+// #[derive(Component, Deref, DerefMut)]
+// pub struct WallNutUiTimer(pub Timer);
+// impl Default for WallNutUiTimer {
+//     fn default() -> Self {
+//         Self(Timer::from_seconds(0.1, TimerMode::Repeating))
+//     }
+// }

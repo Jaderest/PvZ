@@ -67,7 +67,7 @@ impl Default for WindowResolution {
     fn default() -> Self {
         Self {
             large: Vec2::new(1920.0, 1080.0),
-            medium: Vec2::new(1280.0, 720.0),
+            medium: Vec2::new(1200.0, 800.0),
             small: Vec2::new(800.0, 600.0),
         }
     }
@@ -85,7 +85,7 @@ pub struct GameConfig {
 impl Default for GameConfig {
     fn default() -> Self {
         Self {
-            tile_size: 128.0,
+            tile_size: 160.0,
             map_width: 9,
             map_height: 5,
             sun_size: 64.0,

@@ -1,10 +1,8 @@
-use bevy::ecs::system::command;
-use bevy::state::commands;
 use bevy::{prelude::*, render::camera};
 
 use crate::config::*;
 use crate::model::plant_events::*;
-use crate::model::sun::Sun;
+use crate::model::sun::{Sun, SunAmount};
 use crate::model::sun_events::*;
 use crate::model::{components::GridPosition, tile::Tile};
 
@@ -13,7 +11,6 @@ pub fn handle_clicks(
     commands: Commands,
     game_config: Res<GameConfig>,
     mut control_state: ResMut<ControlState>,
-    plant_type: Res<PlantType>,
 
     mouse: Res<ButtonInput<MouseButton>>,
     window: Single<&Window>,
@@ -60,9 +57,9 @@ pub fn handle_clicks(
 
 
     // todo: 根据全全局状态判断调用哪个click
-    // 写状态切换
-    // 写向日葵 & 植物ui（学习一下Sprite UI）
-    // 写阳光运动逻辑
+    // 写状态切换 -
+    // 写向日葵 & 植物ui（学习一下Sprite UI）-
+    // 写阳光运动逻辑 -
     // 写僵尸生成
     // 僵尸运动逻辑
     // 写植物攻击逻辑
@@ -101,7 +98,6 @@ fn plant_click(
     game_config: GameConfig,
     control_state: ResMut<ControlState>,
     tiles: Query<(&GridPosition, &Transform), With<Tile>>,
-
     click_world_position: Vec3,
     mut spawn_plant_writer: EventWriter<SpawnPlantEvent>,
     mut despawn_plant_writer: EventWriter<DespawnPlantEvent>,
