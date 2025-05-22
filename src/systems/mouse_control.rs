@@ -23,26 +23,7 @@ pub fn handle_clicks(
     sun: Query<(Entity, &Sun, &Transform), With<Sun>>,
     pickup_sun_writer: EventWriter<PickupSunEvent>,
 ) {
-    if !mouse.just_pressed(MouseButton::Left) && !mouse.just_pressed(MouseButton::Right) {
-        return;
-    }
-
-    /* 简单写个状态切换 */
-    if mouse.just_pressed(MouseButton::Right) {
-        match *control_state {
-            ControlState::Normal => {
-                *control_state = ControlState::SelectPlant;
-                info!("Switch to SelectPlant");
-            }
-            ControlState::SelectPlant => {
-                *control_state = ControlState::Shovel;
-                info!("Switch to Shovel");
-            }
-            ControlState::Shovel => {
-                *control_state = ControlState::Normal;
-                info!("Switch to Normal");
-            }
-        }
+    if !mouse.just_pressed(MouseButton::Left) {
         return;
     }
 
@@ -54,12 +35,10 @@ pub fn handle_clicks(
         .viewport_to_world(camera_transform, cursor_position)
         .unwrap()
         .origin;
-
-
-    // todo: 根据全全局状态判断调用哪个click
     // 写状态切换 -
     // 写向日葵 & 植物ui（学习一下Sprite UI）-
     // 写阳光运动逻辑 -
+    // 写抛射物
     // 写僵尸生成
     // 僵尸运动逻辑
     // 写植物攻击逻辑
@@ -110,7 +89,7 @@ fn plant_click(
             match *control_state {
                 ControlState::SelectPlant => {
                     // 处理植物点击事件
-                    spawn_plant_writer.write(SpawnPlantEvent {
+                    spawn_plant_writer.write(SpawnPlantEvent { // 不论成功or失败都写入？
                         grid_position: *grid_position,
                     });
                     info!("SelectPlant click at: {:?}", grid_position);

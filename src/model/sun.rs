@@ -53,4 +53,3 @@ impl Default for SunDespawnTimer {
 // ========== UI ==========
 #[derive(Component)]
 pub struct SunUI;
-

@@ -4,9 +4,9 @@ use bevy::{
 };
 use rand::Rng;
 
-use crate::{config::*, model::plant_events::SuccessSpawnPlantEvent};
 use crate::model::sun::*;
 use crate::model::sun_events::*;
+use crate::{config::*, model::plant_events::SuccessSpawnPlantEvent};
 
 // todo: 为天上生成阳光实现动画
 
@@ -18,6 +18,7 @@ impl Plugin for SunPlugin {
             .insert_resource(SunAmount::default())
             .add_event::<PickupSunEvent>()
             .add_event::<SpawnFlowerSunEvent>()
+            .add_event::<SunChangeEvent>()
             .add_systems(Update, sun_produce_sun)
             .add_systems(Update, sun_add)
             .add_systems(Update, sun_consume)
@@ -40,12 +41,10 @@ fn sun_produce_sun(
     let mut rng = rand::rng();
     timer.tick(time.delta());
     if timer.just_finished() {
-        // sun_amount.add(25);
-        // info!("Sun amount: {}", sun_amount.get());
         let x: f32 = rng.random_range(0.0..8.0);
         let y: f32 = rng.random_range(0.0..4.0);
-        // let start = Vec3::new(x, 10, 2.0);
-        let sun_position = grid2pixel(*game_config, x, y, 3.0);
+        
+        let sun_position = grid2pixel(*game_config, x, y, 10.0);
         let start_position = Vec3::new(sun_position.x, 500., sun_position.z);
 
         let AnimationInfo {
@@ -66,7 +65,7 @@ fn sun_produce_sun(
         let sun_id = commands
             .spawn((
                 Sprite {
-                    image: asset_server.load("Simple/Sun.png"),
+                    image: asset_server.load("other/Sun.png"),
                     ..default()
                 },
                 Sun(25),
@@ -119,7 +118,7 @@ fn flower_produce_sun(
         let sun_entity = commands
             .spawn((
                 Sprite {
-                    image: asset_server.load("Simple/Sun.png"),
+                    image: asset_server.load("other/Sun.png"),
                     ..default()
                 },
                 Sun(amount),
@@ -145,17 +144,25 @@ fn flower_produce_sun(
     }
 }
 
-fn sun_add(mut sun_amount: ResMut<SunAmount>, mut pickup_sun_reader: EventReader<PickupSunEvent>) {
+fn sun_add(
+    mut sun_amount: ResMut<SunAmount>,
+    mut pickup_sun_reader: EventReader<PickupSunEvent>,
+    mut sun_change_writer: EventWriter<SunChangeEvent>,
+) {
     for event in pickup_sun_reader.read() {
         sun_amount.add(event.amount);
-        info!("Sun amount: {}", sun_amount.get());
+        sun_change_writer.write(SunChangeEvent(sun_amount.get()));
     }
 }
 
-fn sun_consume(mut sun_amount: ResMut<SunAmount>, mut suc_spawn_plant_reader: EventReader<SuccessSpawnPlantEvent>) {
+fn sun_consume(
+    mut sun_amount: ResMut<SunAmount>,
+    mut suc_spawn_plant_reader: EventReader<SuccessSpawnPlantEvent>,
+    mut sun_change_writer: EventWriter<SunChangeEvent>,
+) {
     for event in suc_spawn_plant_reader.read() {
         sun_amount.sub(event.sun_cost);
-        info!("Sun amount: {}", sun_amount.get());
+        sun_change_writer.write(SunChangeEvent(sun_amount.get()));
     }
 }
 

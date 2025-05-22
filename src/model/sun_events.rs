@@ -14,3 +14,6 @@ pub struct SpawnFlowerSunEvent {
     pub end: Vec3,
     pub sun_position: SunPosition,
 }
+
+#[derive(Event, Debug, Deref, DerefMut)]
+pub struct SunChangeEvent(pub u32);

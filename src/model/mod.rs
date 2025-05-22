@@ -4,3 +4,4 @@ pub mod sun;
 pub mod components;
 pub mod plant_events;
 pub mod sun_events;
+pub mod projectile;

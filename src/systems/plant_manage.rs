@@ -25,6 +25,7 @@ impl Plugin for PlantPlugin {
             .add_event::<SpawnPlantEvent>()
             .add_event::<DespawnPlantEvent>()
             .add_event::<SuccessSpawnPlantEvent>()
+            .add_event::<FailedSpawnPlantEvent>()
             .add_event::<SpawnFlowerSunEvent>()
             .add_systems(Update, spawn_plant)
             .add_systems(Update, despawn_plant)
@@ -46,6 +47,7 @@ fn spawn_plant(
     mut events: EventReader<SpawnPlantEvent>,
     mut tile_query: Query<(&Transform, &mut Child), With<Tile>>,
     mut suc_spawn_plant_writer: EventWriter<SuccessSpawnPlantEvent>,
+    mut fail_spawn_plant_writer: EventWriter<FailedSpawnPlantEvent>,
 ) {
     for event in events.read() {
         let grid_position = event.grid_position;
@@ -58,6 +60,7 @@ fn spawn_plant(
 
         if !has_enough_sun(&plant_type, &plant_cost, &sun_amount) {
             info!("Not enough sun to spawn plant at: {:?}", grid_position);
+            fail_spawn_plant_writer.write(FailedSpawnPlantEvent);
             continue;
         }
 
@@ -127,7 +130,7 @@ fn spawn_plant_entity(
                 },
                 PeaShooter::default(),
                 Plant,
-                UiTimer::new(11),
+                UiTimer::new(0.11, 11),
             ))
             .id(),
 
@@ -146,7 +149,7 @@ fn spawn_plant_entity(
                 },
                 Sunflower::default(),
                 Plant,
-                UiTimer::new(17),
+                UiTimer::new(0.08, 17),
             ))
             .id(),
 
@@ -165,7 +168,7 @@ fn spawn_plant_entity(
                 },
                 WallNut,
                 Plant,
-                UiTimer::new(15),
+                UiTimer::new(0.08, 15),
             ))
             .id(),
     }
@@ -207,7 +210,7 @@ fn sunflower_produce(
     for (mut sunflower, grid_position, transform) in sunflower_query.iter_mut() {
         let mut rng = rand::rng();
         let mut start = transform.translation;
-        start.z = 3.0;
+        start.z = 10.;
         if sunflower.interval.tick(time.delta()).just_finished() {
             let delta_x: f32 = rng.random_range(0.0..0.3);
             let delta_y: f32 = rng.random_range(0.0..0.3);
@@ -215,7 +218,7 @@ fn sunflower_produce(
                 *game_config,
                 grid_position.x() as f32 + delta_x,
                 grid_position.y() as f32 + delta_y,
-                3.0,
+                10.,
             );
             sunflower_produce_writer.write(SpawnFlowerSunEvent {
                 amount: sunflower.sun_amount,

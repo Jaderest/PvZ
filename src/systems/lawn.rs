@@ -13,7 +13,7 @@ pub fn setup_lawn(
 ) {
     let layout = TextureAtlasLayout::from_grid(UVec2::splat(64), 3, 1, None, None);
     let texture_atlas_layout = texture_atlas_layouts.add(layout);
-    let image_handle = asset_server.load("Simple/Tiles.png");
+    let image_handle = asset_server.load("Map/Tiles.png");
 
     let tile_size = game_config.tile_size;
 
@@ -47,4 +47,3 @@ pub fn setup_lawn(
         }
     }
 }
-//TODO: 添加点击生成一个实体，根据grid获取tile实体，并且把tile实体的Option<Entity>设为生成的植物实体

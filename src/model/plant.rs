@@ -76,9 +76,9 @@ impl Default for UiTimer {
     }
 }
 impl UiTimer {
-    pub fn new(max_index: usize) -> Self {
+    pub fn new(duration: f32, max_index: usize) -> Self {
         Self {
-            timer: Timer::from_seconds(0.08, TimerMode::Repeating),
+            timer: Timer::from_seconds(duration, TimerMode::Repeating),
             index: 0,
             max_index,
         }

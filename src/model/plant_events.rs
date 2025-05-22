@@ -13,6 +13,9 @@ pub struct SuccessSpawnPlantEvent {
 }
 
 #[derive(Event, Debug)]
+pub struct FailedSpawnPlantEvent;
+
+#[derive(Event, Debug)]
 pub struct DespawnPlantEvent {
     pub grid_position: GridPosition,
 }

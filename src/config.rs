@@ -42,7 +42,7 @@ impl Default for ControlState {
     }
 }
 
-#[derive(Resource, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Resource, Clone, Copy, PartialEq, Eq, Hash, Component)]
 pub enum PlantType {
     /// 豌豆射手
     PeaShooter,
@@ -67,7 +67,7 @@ impl Default for WindowResolution {
     fn default() -> Self {
         Self {
             large: Vec2::new(1920.0, 1080.0),
-            medium: Vec2::new(1200.0, 800.0),
+            medium: Vec2::new(1300.0, 700.0),
             small: Vec2::new(800.0, 600.0),
         }
     }
@@ -105,8 +105,8 @@ fn setup_window_size(mut window: Single<&mut Window>, resolution: Res<WindowReso
 pub fn grid2pixel(game_config: GameConfig, grid_x: f32, gird_y: f32, z: f32) -> Vec3 {
     let tile_size = game_config.tile_size;
     let lawn_width = game_config.map_width as f32 * tile_size;
-    let bottom_edge_of_tile = -tile_size * (game_config.map_height as f32 - 2.0);
-    let left_edge_of_tile = 0.0 - lawn_width / 2.0;
+    let bottom_edge_of_tile = -tile_size * (game_config.map_height as f32 - 2.5);
+    let left_edge_of_tile = 0.0 - lawn_width / 2.2;
     let offset_x = left_edge_of_tile + tile_size / 2.0;
     let offset_y = bottom_edge_of_tile + tile_size / 2.0;
     Vec3 {
