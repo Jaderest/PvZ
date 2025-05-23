@@ -39,7 +39,7 @@ impl Default for Sunflower {
     fn default() -> Self {
         Self {
             sun_amount: 25,
-            interval: Timer::from_seconds(20.0, TimerMode::Repeating),
+            interval: Timer::from_seconds(20., TimerMode::Repeating),
         }
     }
 }

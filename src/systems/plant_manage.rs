@@ -5,7 +5,6 @@ use rand::Rng;
 use crate::model::plant::*;
 use crate::model::sun::Sun;
 use crate::model::sun::SunAmount;
-use crate::model::sun::SunPosition;
 use crate::model::sun_events::SpawnFlowerSunEvent;
 use crate::model::tile::Lawn;
 
@@ -212,22 +211,17 @@ fn sunflower_produce(
         let mut start = transform.translation;
         start.z = 10.;
         if sunflower.interval.tick(time.delta()).just_finished() {
-            let delta_x: f32 = rng.random_range(0.0..0.3);
-            let delta_y: f32 = rng.random_range(0.0..0.3);
+            let delta_x: f32 = rng.random_range(0.2..0.3);
             let sun_position = grid2pixel(
                 *game_config,
                 grid_position.x() as f32 + delta_x,
-                grid_position.y() as f32 + delta_y,
+                grid_position.y() as f32,
                 10.,
             );
             sunflower_produce_writer.write(SpawnFlowerSunEvent {
                 amount: sunflower.sun_amount,
                 start: start,
                 end: sun_position,
-                sun_position: SunPosition {
-                    x: grid_position.x() as f32 + delta_x,
-                    y: grid_position.y() as f32 + delta_y,
-                },
             });
         }
     }

@@ -1,15 +1,11 @@
 use bevy::{
-    animation::{AnimationTarget},
     prelude::*,
 };
 use rand::Rng;
 
-use crate::model::sun::*;
+use crate::{model::sun::*, view::get_sprites::get_sun_sprite};
 use crate::model::sun_events::*;
 use crate::{config::*, model::plant_events::SuccessSpawnPlantEvent};
-use crate::view::animation::*;
-
-// todo: 为天上生成阳光实现动画
 
 pub struct SunPlugin;
 impl Plugin for SunPlugin {
@@ -24,7 +20,10 @@ impl Plugin for SunPlugin {
             .add_systems(Update, sun_add)
             .add_systems(Update, sun_consume)
             .add_systems(Update, sun_despawn_with_time)
-            .add_systems(Update, flower_produce_sun);
+            .add_systems(Update, flower_produce_sun)
+            .add_systems(Update, sun_fall_system)
+            .add_systems(Update, flower_sun_fall_system)
+            ;
     }
 }
 
@@ -36,8 +35,6 @@ fn sun_produce_sun(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     mut timer: ResMut<GlobalSunTimer>,
-    mut animation_graphs: ResMut<Assets<AnimationGraph>>,
-    mut animation_clips: ResMut<Assets<AnimationClip>>,
 ) {
     let mut rng = rand::rng();
     timer.tick(time.delta());
@@ -48,52 +45,28 @@ fn sun_produce_sun(
         let sun_position = grid2pixel(*game_config, x, y, 10.0);
         let start_position = Vec3::new(sun_position.x, 500., sun_position.z);
 
-        let AnimationInfo {
-            target_name: animation_target_name,
-            target_id: animation_target_id,
-            graph: animation_graph,
-            node_index: animation_node_index,
-        } = AnimationInfo::create_sun(
-            &mut animation_graphs,
-            &mut animation_clips,
-            start_position,
-            sun_position,
-        );
-
-        let mut animation_player = AnimationPlayer::default();
-        animation_player.play(animation_node_index);
-
-        let sun_id = commands
-            .spawn((
-                Sprite {
-                    image: asset_server.load("other/Sun.png"),
-                    ..default()
-                },
-                Sun(25),
-                SunPosition { x, y },
-                SunDespawnTimer::default(),
-                Transform {
-                    translation: start_position,
-                    scale: Vec3::splat(2.),
-                    ..default()
-                },
-                animation_target_name,
-                animation_player,
-                AnimationGraphHandle(animation_graph),
-            ))
-            .id();
-        commands.entity(sun_id).insert(AnimationTarget {
-            id: animation_target_id,
-            player: sun_id,
-        });
+        commands.spawn((
+            get_sun_sprite(&asset_server),
+            Sun(25),
+            FallingSun,
+            FallTimer::default(),
+            SunDespawnTimer::default(),
+            Transform {
+                translation: start_position,
+                scale: Vec3::splat(2.),
+                ..default()
+            },
+            SunDrop {
+                start: start_position,
+                end: sun_position,
+            },
+        ));
     }
 }
 
 fn flower_produce_sun(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
-    mut animation_graphs: ResMut<Assets<AnimationGraph>>,
-    mut animation_clips: ResMut<Assets<AnimationClip>>,
     mut sunflower_produce_reader: EventReader<SpawnFlowerSunEvent>,
 ) {
     for event in sunflower_produce_reader.read() {
@@ -101,47 +74,22 @@ fn flower_produce_sun(
         let end = event.end;
         let amount = event.amount;
 
-        let AnimationInfo {
-            target_name: animation_target_name,
-            target_id: animation_target_id,
-            graph: animation_graph,
-            node_index: animation_node_index,
-        } = AnimationInfo::create_sunflower(
-            &mut animation_graphs,
-            &mut animation_clips,
-            start,
-            end,
-        );
-
-        let mut animation_player = AnimationPlayer::default();
-        animation_player.play(animation_node_index);
-
-        let sun_entity = commands
-            .spawn((
-                Sprite {
-                    image: asset_server.load("other/Sun.png"),
-                    ..default()
-                },
-                Sun(amount),
-                SunPosition {
-                    x: event.sun_position.x,
-                    y: event.sun_position.y,
-                },
-                SunDespawnTimer::default(),
-                Transform {
-                    translation: start,
-                    scale: Vec3::splat(2.),
-                    ..default()
-                },
-                animation_target_name,
-                animation_player,
-                AnimationGraphHandle(animation_graph),
-            ))
-            .id();
-        commands.entity(sun_entity).insert(AnimationTarget {
-            id: animation_target_id,
-            player: sun_entity,
-        });
+        commands.spawn((
+            get_sun_sprite(&asset_server),
+            Sun(amount),
+            FlowerSun,
+            FlowerSunTimer::default(),
+            SunDespawnTimer::default(),
+            Transform {
+                translation: start,
+                scale: Vec3::splat(2.),
+                ..default()
+            },
+            FlowerSunDrop {
+                start: start,
+                end: end,
+            },
+        ));
     }
 }
 
@@ -173,8 +121,46 @@ fn sun_despawn_with_time(
     mut query: Query<(Entity, &mut SunDespawnTimer), With<Sun>>,
 ) {
     for (entity, mut timer) in query.iter_mut() {
-        if timer.tick(time.delta()).just_finished() {
+        if timer.tick(time.delta()).finished() {
             commands.entity(entity).despawn();
         }
+    }
+}
+
+
+fn sun_fall_system(
+    mut sun_query: Query<(&mut Transform, &mut FallTimer, &SunDrop), With<FallingSun>>,
+    time: Res<Time>,
+) {
+    for (mut transform, mut timer, sun_drop) in sun_query.iter_mut() {
+        timer.tick(time.delta());
+        let t = timer.fraction();
+        transform.translation = sun_drop.start.lerp(sun_drop.end, t);
+    }
+}
+
+fn flower_sun_fall_system(
+    mut sun_query: Query<(&mut Transform, &mut FlowerSunTimer, &FlowerSunDrop), With<FlowerSun>>,
+    time: Res<Time>,
+) {
+    for (mut transform, mut timer, sun_drop) in sun_query.iter_mut() {
+        timer.tick(time.delta());
+        let t = timer.fraction();
+        // transform.translation = sun_drop.start.lerp(sun_drop.end, t);
+        let x_start = sun_drop.start.x;
+        let y_start = sun_drop.start.y;
+        let x_end = sun_drop.end.x;
+        let z = sun_drop.start.z;
+
+        let x_max = 1./2. * x_start + 1./2. * x_end;
+        
+        let a = -0.1;
+        let b = -2. * a * x_max;
+        let c = y_start - a * x_start * x_start - b * x_start;
+
+        let x_pos = t * (x_end - x_start) + x_start;
+        let y_pos = a * x_pos * x_pos + b * x_pos + c;
+        
+        transform.translation = Vec3::new(x_pos, y_pos, z);
     }
 }

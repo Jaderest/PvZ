@@ -48,6 +48,15 @@ pub fn get_wallnut_sprite(
     }
 }
 
+pub fn get_sun_sprite(
+    asset_server: &AssetServer,
+) -> Sprite {
+    Sprite {
+        image: asset_server.load("other/Sun.png"),
+        ..default()
+    }
+}
+
 pub fn get_sunflower_card_imagenode(
     asset_server: &AssetServer,
     texture_atlas_layouts: &mut Assets<TextureAtlasLayout>,

@@ -10,7 +10,7 @@ use crate::model::{components::GridPosition, tile::Tile};
 pub fn handle_clicks(
     commands: Commands,
     game_config: Res<GameConfig>,
-    mut control_state: ResMut<ControlState>,
+    control_state: ResMut<ControlState>,
 
     mouse: Res<ButtonInput<MouseButton>>,
     window: Single<&Window>,
