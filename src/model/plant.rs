@@ -84,19 +84,3 @@ impl UiTimer {
         }
     }
 }
-
-// #[derive(Component, Deref, DerefMut)]
-// pub struct PeashooterUiTimer(pub Timer);
-// impl Default for PeashooterUiTimer {
-//     fn default() -> Self {
-//         Self(Timer::from_seconds(0.1, TimerMode::Repeating))
-//     }
-// }
-
-// #[derive(Component, Deref, DerefMut)]
-// pub struct WallNutUiTimer(pub Timer);
-// impl Default for WallNutUiTimer {
-//     fn default() -> Self {
-//         Self(Timer::from_seconds(0.1, TimerMode::Repeating))
-//     }
-// }

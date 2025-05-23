@@ -6,3 +6,5 @@ pub mod sun_manage;
 
 pub mod mouse_control;
 pub mod keyboard_control;
+
+pub mod projectile_manage;

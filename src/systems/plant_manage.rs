@@ -232,3 +232,13 @@ fn sunflower_produce(
         }
     }
 }
+
+fn peashooter_shoot(
+    mut commands: Commands,
+    time: Res<Time>,
+    mut peashooter_query: Query<(&mut PeaShooter, &GridPosition, &Transform), With<Plant>>,
+) {
+    for (mut peashooter, grid_position, transform) in peashooter_query.iter_mut() {
+        
+    }
+}

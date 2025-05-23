@@ -1,5 +1,5 @@
 use bevy::{
-    animation::{AnimationTarget, AnimationTargetId, animated_field},
+    animation::{AnimationTarget},
     prelude::*,
 };
 use rand::Rng;
@@ -7,6 +7,7 @@ use rand::Rng;
 use crate::model::sun::*;
 use crate::model::sun_events::*;
 use crate::{config::*, model::plant_events::SuccessSpawnPlantEvent};
+use crate::view::animation::*;
 
 // todo: 为天上生成阳光实现动画
 
@@ -163,84 +164,6 @@ fn sun_consume(
     for event in suc_spawn_plant_reader.read() {
         sun_amount.sub(event.sun_cost);
         sun_change_writer.write(SunChangeEvent(sun_amount.get()));
-    }
-}
-
-struct AnimationInfo {
-    target_name: Name,
-    target_id: AnimationTargetId,
-    graph: Handle<AnimationGraph>,
-    node_index: AnimationNodeIndex,
-}
-impl AnimationInfo {
-    fn create_sunflower(
-        animation_graphs: &mut Assets<AnimationGraph>,
-        animation_clips: &mut Assets<AnimationClip>,
-        start: Vec3,
-        end: Vec3,
-    ) -> AnimationInfo {
-        let animation_target_name = Name::new("Sun");
-        let animation_target_id = AnimationTargetId::from_name(&animation_target_name);
-
-        let mut animation_clip = AnimationClip::default();
-
-        let animation_domain = interval(0.0, 1.0).unwrap();
-
-        let translation_curve = EasingCurve::new(start, end, EaseFunction::CircularInOut)
-            .reparametrize_linear(animation_domain)
-            .expect("this curve has bounded domain, so this should never fail");
-        animation_clip.add_curve_to_target(
-            animation_target_id,
-            AnimatableCurve::new(animated_field!(Transform::translation), translation_curve),
-        );
-
-        let animation_clip_handle = animation_clips.add(animation_clip);
-
-        let (animation_graph, animation_node_index) =
-            AnimationGraph::from_clip(animation_clip_handle);
-        let animation_graph_handle = animation_graphs.add(animation_graph);
-
-        AnimationInfo {
-            target_name: animation_target_name,
-            target_id: animation_target_id,
-            graph: animation_graph_handle,
-            node_index: animation_node_index,
-        }
-    }
-
-    fn create_sun(
-        animation_graphs: &mut Assets<AnimationGraph>,
-        animation_clips: &mut Assets<AnimationClip>,
-        start: Vec3,
-        end: Vec3,
-    ) -> AnimationInfo {
-        let animation_target_name = Name::new("Sun");
-        let animation_target_id = AnimationTargetId::from_name(&animation_target_name);
-
-        let mut animation_clip = AnimationClip::default();
-
-        let animation_domain = interval(0.0, 5.).unwrap();
-
-        let translation_curve = EasingCurve::new(start, end, EaseFunction::Linear)
-            .reparametrize_linear(animation_domain)
-            .expect("this curve has bounded domain, so this should never fail");
-        animation_clip.add_curve_to_target(
-            animation_target_id,
-            AnimatableCurve::new(animated_field!(Transform::translation), translation_curve),
-        );
-
-        let animation_clip_handle = animation_clips.add(animation_clip);
-
-        let (animation_graph, animation_node_index) =
-            AnimationGraph::from_clip(animation_clip_handle);
-        let animation_graph_handle = animation_graphs.add(animation_graph);
-
-        AnimationInfo {
-            target_name: animation_target_name,
-            target_id: animation_target_id,
-            graph: animation_graph_handle,
-            node_index: animation_node_index,
-        }
     }
 }
 
