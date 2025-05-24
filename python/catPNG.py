@@ -1,12 +1,17 @@
+import re
 from PIL import Image
 import os
 
+def natural_sort_key(s):
+    # 使用正则表达式提取字符串中的数字部分，并将其转换为整数
+    return [int(text) if text.isdigit() else text.lower() for text in re.split('(\d+)', s)]
+
 def concat_images_horizontally(folder_path, output_path='output.png'):
-    # 获取所有png文件并按字典序排序
+    # 获取所有png文件并按自然顺序排序
     image_files = sorted([
         f for f in os.listdir(folder_path)
         if f.lower().endswith('.png')
-    ])
+    ], key=natural_sort_key)
 
     # 加载所有图像
     images = [Image.open(os.path.join(folder_path, f)) for f in image_files]
@@ -28,6 +33,7 @@ def concat_images_horizontally(folder_path, output_path='output.png'):
     # 拼接图像
     x_offset = 0
     for img in images:
+        print(f"拼接图像: {img.filename}")
         new_image.paste(img, (x_offset, 0))
         x_offset += img.width
 
@@ -38,5 +44,5 @@ def concat_images_horizontally(folder_path, output_path='output.png'):
 # 🧪 示例使用
 # 请替换为你自己的路径
 if __name__ == '__main__':
-    folder = 'C:/Users/Jade/Downloads/SunFlower'
-    concat_images_horizontally(folder, 'SunFlower.png')
+    folder = 'C:/Users/Jade/Downloads/Zombie2'
+    concat_images_horizontally(folder, 'Zombie2.png')

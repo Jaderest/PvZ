@@ -7,11 +7,13 @@ use crate::model::sun::Sun;
 use crate::model::sun::SunAmount;
 use crate::model::sun_events::SpawnFlowerSunEvent;
 use crate::model::tile::Lawn;
+use crate::model::projectile_events::SpawnPeaEvent;
 
 use crate::config::*;
-use crate::model::components::GridPosition;
+use crate::model::components::*;
 use crate::model::plant_events::*;
 use crate::model::tile::{Child, Tile};
+use crate::model::zombie::*;
 use crate::view::get_sprites::*;
 use crate::view::plant_animation::*;
 
@@ -29,7 +31,9 @@ impl Plugin for PlantPlugin {
             .add_systems(Update, spawn_plant)
             .add_systems(Update, despawn_plant)
             .add_systems(Update, sunflower_produce)
-            .add_systems(Update, play_plant_animation);
+            .add_systems(Update, play_plant_animation)
+            .add_systems(Update, peashooter_shoot)
+            ;
     }
 }
 
@@ -129,7 +133,7 @@ fn spawn_plant_entity(
                 },
                 PeaShooter::default(),
                 Plant,
-                UiTimer::new(0.11, 11),
+                UiTimer::new_plant(0.11, 11),
             ))
             .id(),
 
@@ -148,7 +152,7 @@ fn spawn_plant_entity(
                 },
                 Sunflower::default(),
                 Plant,
-                UiTimer::new(0.08, 17),
+                UiTimer::new_plant(0.08, 17),
             ))
             .id(),
 
@@ -167,7 +171,7 @@ fn spawn_plant_entity(
                 },
                 WallNut,
                 Plant,
-                UiTimer::new(0.08, 15),
+                UiTimer::new_plant(0.08, 15),
             ))
             .id(),
     }
@@ -228,11 +232,33 @@ fn sunflower_produce(
 }
 
 fn peashooter_shoot(
-    mut commands: Commands,
     time: Res<Time>,
     mut peashooter_query: Query<(&mut PeaShooter, &GridPosition, &Transform), With<Plant>>,
+    zombie_query: Query<&ZombiePosition>,
+    mut spawn_pea_writer: EventWriter<SpawnPeaEvent>,
 ) {
     for (mut peashooter, grid_position, transform) in peashooter_query.iter_mut() {
-        
+        peashooter.fire_interval.tick(time.delta());
+        // 不知道这里计时器的just_finished()一直记下去会发生什么，看看要不要换成Once并且手动刷新？
+        for zombie_position in zombie_query.iter() {
+            if zombie_position.y != grid_position.y() {
+                continue; // 只射击同一行的僵尸
+            }
+            let zombie_x = zombie_position.x;
+            let plant_x = grid_position.x() as f32; // 植物的x坐标
+            if peashooter.fire_interval.just_finished() && zombie_x > plant_x {
+                // 如果植物的射击间隔刚好结束，并且僵尸在植物的右侧
+                spawn_pea_writer.write(SpawnPeaEvent {
+                    start: transform.translation,
+                    start_grid: *grid_position,
+                });
+            }
+        }
+        // if peashooter.fire_interval.just_finished() {
+        //     spawn_pea_writer.write(SpawnPeaEvent {
+        //         start: transform.translation,
+        //         start_grid: *grid_position,
+        //     });
+        // }
     }
 }

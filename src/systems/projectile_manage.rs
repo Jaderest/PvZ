@@ -1,40 +1,66 @@
-use bevy::{prelude::*, state::commands};
+use bevy::log::tracing_subscriber::fmt::time;
+use bevy::prelude::*;
 
 use crate::model::projectile::*;
 use crate::model::projectile_events::*;
-use crate::config::*;
-use crate::view::animation::AnimationInfo;
+use crate::view::get_sprites::*;
 
 
-fn spawn_pea( // 需要添加动画好像
-    commands: &mut Commands,
+pub struct ProjectilePlugin;
+impl Plugin for ProjectilePlugin {
+    fn build(&self, app: &mut App) {
+        app.add_event::<SpawnPeaEvent>()
+            .add_systems(Update, spawn_pea)
+            .add_systems(Update, move_pea)
+            .add_systems(Update, despawn_pea)
+            ;
+    }
+}
+
+fn spawn_pea(
+    mut commands: Commands,
     asset_server: Res<AssetServer>,
-    game_config: Res<GameConfig>,
     mut spawn_pea_event_reader: EventReader<SpawnPeaEvent>,
-
-    mut animation_graphs: ResMut<Assets<AnimationGraph>>,
-    mut animation_clips: ResMut<Assets<AnimationClip>>,
 ) {
     for event in spawn_pea_event_reader.read() {
-        let start_grid = event.start_grid;
-        let start_position = grid2pixel(*game_config, start_grid.x() as f32, start_grid.y() as f32, 4.);
-        // 有个不太好的地方是我豌豆飞行速度是由这个常数1500.决定的
-        // 我真的要用这个动画吗？还是手动控制velocity
-        let end_position = Vec3::new(
-            start_position.x + 1500.,
-            start_position.y,
-            start_position.z,
-        );
-        let AnimationInfo {
-            target_name: animation_target_name,
-            target_id: animation_target_id,
-            graph: animation_graph,
-            node_index: animation_node_index,
-        } = AnimationInfo::create_pea(
-            &mut animation_graphs,
-            &mut animation_clips,
-            start_position,
-            end_position,
-        );
+        let row = event.start_grid.y();
+        let mut start_translation = event.start;
+        start_translation.y += 50.0; // Adjust the Y position to start above the grid
+        start_translation.x += 50.0; // Adjust the X position to start above the grid
+        commands.spawn((
+            get_pea_sprite(&asset_server),
+            Pea,
+            Transform {
+                translation: start_translation,
+                scale: Vec3::splat(2.),
+                ..default()
+            },
+            ProjRow(row),
+            Velocity::get_pea(),
+            ProjLife::default(),
+        ));
+    }
+}
+
+fn move_pea(
+    mut pea_query: Query<(&mut Transform, &Velocity), With<Pea>>,
+    time: Res<Time>,
+) {
+    for (mut transform, velocity) in pea_query.iter_mut() {
+        transform.translation.x += velocity.x * time.delta_secs();
+        transform.translation.y += velocity.y * time.delta_secs();
+    }
+}
+
+fn despawn_pea(
+    mut commands: Commands,
+    mut pea_query: Query<(Entity, &mut ProjLife), With<Pea>>,
+    time: Res<Time>,
+) {
+    for (entity, mut life) in pea_query.iter_mut() {
+        life.tick(time.delta());
+        if life.finished() {
+            commands.entity(entity).despawn();
+        }
     }
 }

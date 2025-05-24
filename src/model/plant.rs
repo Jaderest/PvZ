@@ -58,29 +58,3 @@ impl Default for PlantCost {
         Self(cost)
     }
 }
-
-#[derive(Component)]
-pub struct UiTimer {
-    pub timer: Timer,
-    pub index: usize,
-    pub max_index: usize,
-}
-
-impl Default for UiTimer {
-    fn default() -> Self {
-        Self {
-            timer: Timer::from_seconds(0.1, TimerMode::Repeating),
-            index: 0,
-            max_index: 0,
-        }
-    }
-}
-impl UiTimer {
-    pub fn new(duration: f32, max_index: usize) -> Self {
-        Self {
-            timer: Timer::from_seconds(duration, TimerMode::Repeating),
-            index: 0,
-            max_index,
-        }
-    }
-}

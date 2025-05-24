@@ -57,6 +57,60 @@ pub fn get_sun_sprite(
     }
 }
 
+pub fn get_pea_sprite(
+    asset_server: &AssetServer,
+) -> Sprite {
+    Sprite {
+        image: asset_server.load("other/ProjectilePea.png"),
+        ..default()
+    }
+}
+
+pub fn get_zombie_sprite(
+    asset_server: &AssetServer,
+    texture_atlas_layouts: &mut Assets<TextureAtlasLayout>,
+    sprite_type: u8,
+) -> Sprite {
+    match sprite_type {
+        0 => return get_zombie_sprite_0(asset_server, texture_atlas_layouts),
+        1 => return get_zombie_sprite_1(asset_server, texture_atlas_layouts),
+        _ => panic!("Invalid zombie sprite type"),
+    }
+}
+
+fn get_zombie_sprite_0(
+    asset_server: &AssetServer,
+    texture_atlas_layouts: &mut Assets<TextureAtlasLayout>,
+) -> Sprite {
+    let layout = TextureAtlasLayout::from_grid(UVec2::new(166, 144), 22, 1, None, None);
+    
+    let texture_atlas_layout = texture_atlas_layouts.add(layout);
+    Sprite {
+        image: asset_server.load("Zombies/Zombie.png"),
+        texture_atlas: Some(TextureAtlas {
+            layout: texture_atlas_layout.clone(),
+            index: 0,
+        }),
+        ..default()
+    }
+}
+
+fn get_zombie_sprite_1(
+    asset_server: &AssetServer,
+    texture_atlas_layouts: &mut Assets<TextureAtlasLayout>,
+) -> Sprite {
+    let layout = TextureAtlasLayout::from_grid(UVec2::new(166, 144), 31, 1, None, None);
+    let texture_atlas_layout = texture_atlas_layouts.add(layout);
+    Sprite {
+        image: asset_server.load("Zombies/Zombie2.png"),
+        texture_atlas: Some(TextureAtlas {
+            layout: texture_atlas_layout.clone(),
+            index: 0,
+        }),
+        ..default()
+    }
+}
+
 pub fn get_sunflower_card_imagenode(
     asset_server: &AssetServer,
     texture_atlas_layouts: &mut Assets<TextureAtlasLayout>,

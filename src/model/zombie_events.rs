@@ -1,7 +1,6 @@
 use bevy::prelude::*;
 
-#[derive(Component, Debug)]
+#[derive(Event, Debug)]
 pub struct ZombieSpawnEvent {
-    pub x: f32,
     pub y: u32,
 }

@@ -8,3 +8,4 @@ pub mod mouse_control;
 pub mod keyboard_control;
 
 pub mod projectile_manage;
+pub mod zombie_manage;

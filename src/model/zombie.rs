@@ -19,17 +19,17 @@ pub struct ZombieSpeed {
     pub speed: f32,
 }
 
-#[derive(Component, Debug)]
-pub struct ZombieRunTimer {
-    pub timer: Timer,
-}
-impl Default for ZombieRunTimer {
-    fn default() -> Self {
-        Self {
-            timer: Timer::from_seconds(0.5, TimerMode::Repeating),
-        }
-    }
-}
+// #[derive(Component, Debug)]
+// pub struct ZombieRunTimer {
+//     pub timer: Timer,
+// }
+// impl Default for ZombieRunTimer {
+//     fn default() -> Self {
+//         Self {
+//             timer: Timer::from_seconds(0.5, TimerMode::Repeating),
+//         }
+//     }
+// }
 
 #[derive(Component, Debug)]
 pub struct ZombieAtkTimer {

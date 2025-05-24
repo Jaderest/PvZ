@@ -6,3 +6,5 @@ pub mod sun;
 pub mod sun_events;
 pub mod projectile;
 pub mod projectile_events;
+pub mod zombie;
+pub mod zombie_events;
