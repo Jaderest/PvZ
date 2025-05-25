@@ -232,7 +232,7 @@ pub fn card_click_system(
 pub fn card_plant_event(
     mut suc_spawn_plant_reader: EventReader<SuccessSpawnPlantEvent>,
     mut fail_spawn_plant_reader: EventReader<FailedSpawnPlantEvent>,
-    mut despawn_plant_reader: EventReader<DespawnPlantEvent>,
+    mut despawn_plant_reader: EventReader<ShovelPlantEvent>,
     mut control_state: ResMut<ControlState>,
     mut card_query: Query<&mut ImageNode, (With<Button>, With<CardUI>)>,
     // todo: 不知道要不要重构一下PlantType的enum，重置为None
@@ -302,7 +302,7 @@ pub fn shovel_click_system(
 }
 
 pub fn shovel_plant_event(
-    mut despawn_plant_reader: EventReader<DespawnPlantEvent>,
+    mut despawn_plant_reader: EventReader<ShovelPlantEvent>,
     mut interaction_query: Query<&mut Visibility, (With<Button>, With<ShovelUI>)>,
 ) {
     for _event in despawn_plant_reader.read() {

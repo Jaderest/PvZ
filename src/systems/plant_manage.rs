@@ -1,8 +1,10 @@
+use bevy::ecs::event;
 use bevy::gilrs;
 use bevy::prelude::*;
 use rand::Rng;
 
 use crate::model::plant::*;
+use crate::model::events::*;
 use crate::model::sun::Sun;
 use crate::model::sun::SunAmount;
 use crate::model::sun_events::SpawnFlowerSunEvent;
@@ -16,26 +18,6 @@ use crate::model::tile::{Child, Tile};
 use crate::model::zombie::*;
 use crate::view::get_sprites::*;
 use crate::view::play_animation::*;
-
-pub struct PlantPlugin;
-impl Plugin for PlantPlugin {
-    fn build(&self, app: &mut App) {
-        // 添加event
-        // 添加系统
-        app.insert_resource(PlantCost::default())
-            .add_event::<SpawnPlantEvent>()
-            .add_event::<DespawnPlantEvent>()
-            .add_event::<SuccessSpawnPlantEvent>()
-            .add_event::<FailedSpawnPlantEvent>()
-            .add_event::<SpawnFlowerSunEvent>()
-            .add_systems(Update, spawn_plant)
-            .add_systems(Update, despawn_plant)
-            .add_systems(Update, sunflower_produce)
-            .add_systems(Update, play_plant_animation)
-            .add_systems(Update, peashooter_shoot)
-            ;
-    }
-}
 
 // 根据事件，读取全局状态来生成植物
 pub fn spawn_plant(
@@ -177,11 +159,11 @@ fn spawn_plant_entity(
     }
 }
 
-pub fn despawn_plant(
-    mut commands: Commands,
+pub fn shovel_plant(
     lawn: ResMut<Lawn>,
-    mut events: EventReader<DespawnPlantEvent>,
+    mut events: EventReader<ShovelPlantEvent>,
     mut tile_query: Query<&mut Child, With<Tile>>,
+    mut plant_query: Query<&mut PlantHealth, With<Plant>>,
 ) {
     for event in events.read() {
         let grid_position = event.grid_position;
@@ -194,11 +176,38 @@ pub fn despawn_plant(
                     info!("No plant to despawn at: {:?}", grid_position);
                     continue;
                 };
-                commands.entity(plant_entity).despawn();
-                info!("Despawn plant at: {:?}", grid_position);
-
+                info!("shovel here");
+                if let Ok(mut plant_health) = plant_query.get_mut(plant_entity) {
+                    plant_health.current = -1.;
+                }
                 child.plant = None;
             }
+        }
+    }
+}
+
+pub fn plant_receive_damage(
+    mut plant_query: Query<&mut PlantHealth, With<Plant>>,
+    mut events_reader: EventReader<PlantReceiveDamageEvent>,
+) {
+    for event in events_reader.read() {
+        if let Ok(mut plant_health) = plant_query.get_mut(event.plant) {
+            plant_health.current -= event.damage;
+            info!("Plant {:?} remainning health: {}", event.plant, plant_health.current);
+        } else {
+            info!("Plant {:?} not found for damage event.", event.plant);
+        }
+    }
+}
+
+pub fn despawn_plant(
+    mut commands: Commands,
+    mut plant_query: Query<(Entity, &mut PlantHealth), With<Plant>>,
+) {
+    for (entity, health) in plant_query.iter_mut() {
+        if health.current <= 0.0 {
+            info!("Despawning plant entity: {:?}", entity);
+            commands.entity(entity).despawn();
         }
     }
 }

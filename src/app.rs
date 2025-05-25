@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use bevy::scene::ron::de;
 
 use crate::config::*;
 use crate::model::plant::*;
@@ -8,6 +9,7 @@ use crate::model::sun::*;
 use crate::model::sun_events::*;
 use crate::model::zombie::*;
 use crate::model::zombie_events::*;
+use crate::model::events::*;
 
 use crate::view::play_animation::*;
 use crate::view::pvz_ui::*;
@@ -50,16 +52,18 @@ pub fn run() {
         // Plant management
         .insert_resource(PlantCost::default())
         .add_event::<SpawnPlantEvent>()
-        .add_event::<DespawnPlantEvent>()
+        .add_event::<ShovelPlantEvent>()
         .add_event::<SuccessSpawnPlantEvent>()
         .add_event::<FailedSpawnPlantEvent>()
         .add_event::<SpawnFlowerSunEvent>()
-        .add_systems(Update, spawn_plant)
-        // TODO：检查shovel和僵尸的伤害，还是统一让生命归0提供一个收集器发送事件呢？
-        .add_systems(Update, despawn_plant)
-        .add_systems(Update, sunflower_produce)
-        .add_systems(Update, peashooter_shoot)
-        .add_systems(Update, play_plant_animation)
+        .add_systems(Update, (
+            spawn_plant,
+            shovel_plant,
+            sunflower_produce,
+            peashooter_shoot,
+            play_plant_animation,
+            despawn_plant,
+        ))
         // Sun management
         .insert_resource(GlobalSunTimer::default())
         .insert_resource(SunAmount::default())
@@ -91,7 +95,17 @@ pub fn run() {
                 despawn_zombie
             ),
         )
-        // TODO: 加一个僵尸回收器
+        // Zombie Plant 
+        .add_event::<ZombieCollidePlantEvent>()
+        .add_event::<PlantReceiveDamageEvent>()
+        .add_event::<ZombieTargetNotExistEvent>()
+        .add_systems(Update, (
+            detect_zombie_plant_collision,
+            handle_zombie_collide_plant,
+            zombie_attack_plant,
+            zombie_recover_walk_system,
+            plant_receive_damage,
+        ))
         .add_systems(Update, play_zombie_animation)
         .run();
 }

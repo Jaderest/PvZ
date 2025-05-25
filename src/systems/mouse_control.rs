@@ -18,7 +18,7 @@ pub fn handle_clicks(
 
     tiles: Query<(&GridPosition, &Transform), With<Tile>>,
     spawn_plant_writer: EventWriter<SpawnPlantEvent>,
-    despawn_plant_writer: EventWriter<DespawnPlantEvent>,
+    despawn_plant_writer: EventWriter<ShovelPlantEvent>,
 
     sun: Query<(Entity, &Sun, &Transform), With<Sun>>,
     pickup_sun_writer: EventWriter<PickupSunEvent>,
@@ -79,7 +79,7 @@ fn plant_click(
     tiles: Query<(&GridPosition, &Transform), With<Tile>>,
     click_world_position: Vec3,
     mut spawn_plant_writer: EventWriter<SpawnPlantEvent>,
-    mut despawn_plant_writer: EventWriter<DespawnPlantEvent>,
+    mut despawn_plant_writer: EventWriter<ShovelPlantEvent>,
 ) {
     let tile_size = game_config.tile_size;
     for (grid_position, transform) in tiles.iter() {
@@ -96,7 +96,7 @@ fn plant_click(
                 }
                 ControlState::Shovel => {
                     // 处理铲子点击事件
-                    despawn_plant_writer.write(DespawnPlantEvent {
+                    despawn_plant_writer.write(ShovelPlantEvent {
                         grid_position: *grid_position,
                     });
                     info!("SelectShovel click at: {:?}", grid_position);

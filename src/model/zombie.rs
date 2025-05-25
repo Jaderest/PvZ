@@ -19,27 +19,59 @@ pub struct ZombieSpeed {
     pub speed: f32,
 }
 
-// #[derive(Component, Debug)]
-// pub struct ZombieRunTimer {
-//     pub timer: Timer,
-// }
-// impl Default for ZombieRunTimer {
-//     fn default() -> Self {
-//         Self {
-//             timer: Timer::from_seconds(0.5, TimerMode::Repeating),
-//         }
-//     }
-// }
-
-#[derive(Component, Debug)]
-pub struct ZombieAtkTimer {
-    pub timer: Timer,
+#[derive(Component, Debug, Clone, Copy)]
+pub enum ZombieBehavior {
+    Walk,
+    Attack,
 }
+impl Default for ZombieBehavior {
+    fn default() -> Self {
+        Self::Walk
+    }
+}
+impl ZombieBehavior {
+    pub fn is_walk(&self) -> bool {
+        matches!(self, Self::Walk)
+    }
+    pub fn is_attack(&self) -> bool {
+        matches!(self, Self::Attack)
+    }
+    pub fn set_to(&mut self, behavior: Self) {
+        // 这个Self表示自己的类型
+        *self = behavior;
+    }
+}
+
+#[derive(Component, Debug, Deref, DerefMut)]
+pub struct ZombieAtkTimer(Timer);
 impl Default for ZombieAtkTimer {
     fn default() -> Self {
-        Self {
-            timer: Timer::from_seconds(1.0, TimerMode::Repeating),
+        Self(Timer::from_seconds(1.0, TimerMode::Repeating))
+    }
+}
+
+#[derive(Component, Debug)]
+pub enum ZombieTargetPlant {
+    Some(Entity),
+    None,
+}
+impl Default for ZombieTargetPlant {
+    fn default() -> Self {
+        Self::None
+    }
+}
+impl ZombieTargetPlant {
+    pub fn get_target(&self) -> Option<Entity> {
+        match self {
+            Self::Some(entity) => Some(*entity),
+            Self::None => None,
         }
+    }
+    pub fn set_target(&mut self, target: Entity) {
+        *self = Self::Some(target);
+    }
+    pub fn clear_target(&mut self) {
+        *self = Self::None;
     }
 }
 

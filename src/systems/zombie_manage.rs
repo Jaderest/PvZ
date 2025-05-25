@@ -1,12 +1,7 @@
-use bevy::{
-    math::bounding::{Aabb2d, BoundingCircle, BoundingVolume, IntersectsVolume},
-    prelude::*,
-};
-use rand::Rng;
-
-use crate::model::{projectile::Velocity, zombie::*};
+use crate::model::events::*;
 use crate::model::zombie_events::*;
 use crate::model::{components::UiTimer, projectile::Hit};
+use crate::model::{projectile::Velocity, zombie::*};
 use crate::systems::keyboard_control::*;
 use crate::view::get_sprites::get_zombie_sprite;
 use crate::view::play_animation::*;
@@ -17,18 +12,11 @@ use crate::{
         zombie,
     },
 };
-
-pub struct ZombiePlugin;
-impl Plugin for ZombiePlugin {
-    fn build(&self, app: &mut App) {
-        app.add_event::<ZombieSpawnEvent>()
-            .add_systems(Update, spawn_zombie)
-            .add_systems(Update, play_zombie_animation)
-            .add_systems(Update, keyboard_spawn_zombie)
-            .add_systems(Update, zombie_move)
-            ;
-    }
-}
+use bevy::{
+    math::bounding::{Aabb2d, BoundingCircle, BoundingVolume, IntersectsVolume},
+    prelude::*,
+};
+use rand::Rng;
 
 pub fn spawn_zombie(
     mut commands: Commands,
@@ -39,7 +27,7 @@ pub fn spawn_zombie(
 ) {
     for event in zombie_spawn_event.read() {
         info!("Spawn zombie at y: {}", event.y);
-        let zombie_position = ZombiePosition::new(9.5, event.y);
+        let zombie_position = ZombiePosition::new(8.5, event.y);
         let mut zombie_translation = grid2pixel(
             *game_config,
             zombie_position.x,
@@ -50,58 +38,51 @@ pub fn spawn_zombie(
         let zombie_damage = ZombieDamage { damage: 10.0 };
 
         //TODO: 检查魔法数字
-        zombie_translation.y += 40.0;
+        zombie_translation.y += 60.0;
         let mut rng = rand::rng();
-        if rng.random_bool(0.5) {
-            commands.spawn((
+        let (zombie_sprite, zombie_type) = if rng.random_bool(0.5) {
+            (
                 get_zombie_sprite(&asset_server, &mut texture_atlas_layouts, 0),
-                Zombie,
-                zombie_position,
-                zombie_speed,
-                ZombieAtkTimer::default(),
-                ZombieHealth {
-                    current: 100.0,
-                    max: 100.0,
-                },
-                zombie_damage,
-                ZombieDefender::None,
                 UiTimer::zombie_type0(),
-                Transform {
-                    translation: zombie_translation,
-                    scale: Vec3::splat(1.7),
-                    ..default()
-                },
-            ));
+            )
         } else {
-            commands.spawn((
+            (
                 get_zombie_sprite(&asset_server, &mut texture_atlas_layouts, 1),
-                Zombie,
-                zombie_position,
-                zombie_speed,
-                ZombieAtkTimer::default(),
-                ZombieHealth {
-                    current: 100.0,
-                    max: 100.0,
-                },
-                zombie_damage,
-                ZombieDefender::None,
                 UiTimer::zombie_type1(),
-                Transform {
-                    translation: zombie_translation,
-                    scale: Vec3::splat(1.7),
-                    ..default()
-                },
-            ));
-        }
+            )
+        };
+        commands.spawn((
+            zombie_sprite,
+            Zombie,
+            zombie_position,
+            zombie_speed,
+            ZombieBehavior::default(),
+            ZombieAtkTimer::default(),
+            ZombieTargetPlant::default(),
+            ZombieHealth {
+                current: 100.0,
+                max: 100.0,
+            },
+            zombie_damage,
+            ZombieDefender::None,
+            zombie_type,
+            Transform {
+                translation: zombie_translation,
+                scale: Vec3::splat(2.0),
+                ..default()
+            },
+        ));
     }
 }
 
 pub fn zombie_move(
-    mut zombie_query: Query<(&mut Transform, &ZombieSpeed)>,
+    mut zombie_query: Query<(&mut Transform, &ZombieSpeed, &ZombieBehavior), With<Zombie>>,
     time: Res<Time>,
 ) {
-    for (mut transform, speed) in zombie_query.iter_mut() {
-        transform.translation.x -= speed.speed * time.delta_secs();
+    for (mut transform, speed, behavior) in zombie_query.iter_mut() {
+        if behavior.is_walk() {
+            transform.translation.x -= speed.speed * time.delta_secs();
+        }
     }
 }
 
@@ -114,6 +95,26 @@ pub fn despawn_zombie(
             info!("Zombie despawned at position: {:?}", transform.translation);
             commands.entity(entity).despawn();
             // 发送一个事件，用实体播放僵尸死亡动画
+        }
+    }
+}
+
+pub fn zombie_recover_walk_system(
+    mut zombie_query: Query<(&mut ZombieBehavior, &mut ZombieTargetPlant), With<Zombie>>,
+    mut zombie_target_not_exist_reader: EventReader<ZombieTargetNotExistEvent>,
+) {
+    for event in zombie_target_not_exist_reader.read() {
+        if let Ok((mut zombie_behavior, mut zombie_target)) = zombie_query.get_mut(event.zombie) {
+            if zombie_behavior.is_attack() {
+                *zombie_behavior = ZombieBehavior::Walk;
+                zombie_target.clear_target();
+                info!(
+                    "Zombie {} recovered to walk state, target not exists",
+                    event.zombie
+                );
+            }
+        } else {
+            info!("Zombie {} not found for recovery", event.zombie);
         }
     }
 }

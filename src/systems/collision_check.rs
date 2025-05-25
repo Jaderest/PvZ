@@ -4,6 +4,7 @@ use bevy::{
     prelude::*,
 };
 
+use crate::config::GameConfig;
 use crate::model::components::*;
 use crate::model::plant::*;
 use crate::model::projectile::*;
@@ -64,8 +65,127 @@ pub fn handle_pea_hit_zombie(
 
 // 僵尸攻击植物，给僵尸添加一个状态、Walk/Attack，然后根据这个判断僵尸走不走
 // 同时发送状态切换到Attack的事件，如果僵尸状态改变，换一次贴图和UiTimer，并且给僵尸添加一个攻击计时器，攻击植物
-fn detect_zombie_plant_collision(
+// 那么怎么切换回来呢？
+pub fn detect_zombie_plant_collision(
+    game_config: Res<GameConfig>,
     mut plant_query: Query<(Entity, &Transform, &GridPosition), With<Plant>>,
-    mut zombie_query: Query<(Entity, &Transform, &ZombiePosition), With<Zombie>>,
+    mut zombie_query: Query<(Entity, &Transform, &ZombiePosition, &ZombieBehavior), With<Zombie>>,
+    mut collision_event_writer: EventWriter<ZombieCollidePlantEvent>,
 ) {
+    for (plant_entity, plant_transform, plant_grid) in plant_query.iter_mut() {
+        for (zombie_entity, zombie_transform, zombie_position, zombie_behavior) in
+            zombie_query.iter_mut()
+        {
+            if zombie_position.y != plant_grid.y() {
+                continue; // Skip if the zombie is not on the same row as the plant
+            }
+            if !zombie_behavior.is_walk() {
+                continue; // Skip if the zombie is not in walking state
+            }
+            let mut zombie_center = zombie_transform.translation.truncate();
+            zombie_center.x += 50.0;
+            let zombie_aabb = Aabb2d::new(zombie_center, Vec2::new(85.0 / 4.0, 129.0 / 4.0));
+            let zombie_bounding_circle = zombie_aabb.bounding_circle();
+
+            let plant_center = plant_transform.translation.truncate();
+            let plant_aabb = Aabb2d::new(plant_center, Vec2::splat(game_config.tile_size / 3.0));
+            let plant_bounding_circle = plant_aabb.bounding_circle();
+            if plant_bounding_circle.intersects(&zombie_bounding_circle) {
+                collision_event_writer.write(ZombieCollidePlantEvent {
+                    zombie: zombie_entity,
+                    plant: plant_entity,
+                    zombie_behavior: ZombieBehavior::Attack,
+                });
+            }
+        }
+    }
 }
+
+// 哦对你是事件驱动，没发送事件给你
+pub fn handle_zombie_collide_plant(
+    mut events_reader: EventReader<ZombieCollidePlantEvent>,
+    mut zombie_query: Query<
+        (
+            &mut ZombieBehavior,
+            &mut ZombieAtkTimer,
+            &mut ZombieTargetPlant,
+        ),
+        With<Zombie>,
+    >,
+) {
+    for event in events_reader.read() {
+        if let Ok((mut zombie_behavior, mut zombie_atk_timer, mut zombie_target)) =
+            zombie_query.get_mut(event.zombie)
+        {
+            if zombie_behavior.is_walk() {
+                zombie_behavior.set_to(event.zombie_behavior);
+                zombie_target.set_target(event.plant);
+                zombie_atk_timer.reset(); // 重置攻击计时器
+                info!(
+                    "Zombie {} changes behavior to {:?} for plant {}",
+                    event.zombie, zombie_behavior, event.plant
+                );
+                // TODO: 添加切换贴图
+            }
+        }
+    }
+}
+
+pub fn zombie_attack_plant(
+    mut zombie_query: Query<
+        (
+            Entity,
+            &mut ZombieBehavior,
+            &mut ZombieAtkTimer,
+            &mut ZombieTargetPlant,
+            &ZombieDamage,
+        ),
+        With<Zombie>,
+    >,
+    plant_query: Query<Entity, With<Plant>>,
+    time: Res<Time>,
+    mut plant_receive_dmg_event_writer: EventWriter<PlantReceiveDamageEvent>,
+    mut zombie_target_not_exist_event_writer: EventWriter<ZombieTargetNotExistEvent>,
+) {
+    for (
+        zombie_entity,
+        zombie_behavior,
+        mut zombie_atk_timer,
+        zombie_target,
+        zombie_damage,
+    ) in zombie_query.iter_mut()
+    {
+        if zombie_behavior.is_attack() {
+            if let Some(plant_entity) = zombie_target.get_target() {
+                // 检查植物是否存在
+                if let Ok(_) = plant_query.get(plant_entity) {
+                    // 如果僵尸处于攻击状态，开始计时
+                    zombie_atk_timer.tick(time.delta());
+                    if zombie_atk_timer.just_finished() {
+                        // 发送植物受到伤害的事件
+                        plant_receive_dmg_event_writer.write(PlantReceiveDamageEvent {
+                            plant: plant_entity,
+                            damage: zombie_damage.damage,
+                        });
+                        info!(
+                            "Zombie {:?} attacks plant {:?} for {} damage",
+                            zombie_behavior, plant_entity, zombie_damage.damage
+                        );
+                    }
+                } else {
+                    zombie_target_not_exist_event_writer.write(ZombieTargetNotExistEvent {
+                        zombie: zombie_entity,
+                    });
+                }
+            } else {
+                // 如果没有目标，恢复行走状态
+                panic!(
+                    "Zombie {:?} has no target plant, resetting behavior to Walk",
+                    zombie_behavior
+                );
+            }
+        }
+    }
+}
+
+// TODO: 检查僵尸攻击植物是否还在，似了就恢复zombie状态
