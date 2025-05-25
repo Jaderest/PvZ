@@ -35,7 +35,7 @@ impl Plugin for MyUIPlugin {
     }
 }
 
-fn setup_bank_ui(
+pub fn setup_bank_ui(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     sun_amount: Res<SunAmount>,
@@ -141,7 +141,7 @@ fn setup_bank_ui(
         });
 }
 
-fn update_sun_bank_ui(
+pub fn update_sun_bank_ui(
     sun_bank_ui: Single<&mut Text, With<SunBankText>>,
     mut sun_change_event_reader: EventReader<SunChangeEvent>,
 ) {
@@ -153,7 +153,7 @@ fn update_sun_bank_ui(
 
 // TODO: 为card添加蒙版，来动态显示seed的冷却时间
 // TODO: 添加鼠标跟随
-fn card(
+pub fn card(
     asset_server: &AssetServer,
     texture_atlas_layouts: &mut Assets<TextureAtlasLayout>,
     index: usize,
@@ -187,7 +187,7 @@ fn card(
     )
 }
 
-fn card_click_system(
+pub fn card_click_system(
     mut interaction_query: Query<
         (&Interaction, &mut ImageNode, &PlantType),
         (Changed<Interaction>, With<Button>, With<CardUI>),
@@ -229,7 +229,7 @@ fn card_click_system(
     }
 }
 
-fn card_plant_event(
+pub fn card_plant_event(
     mut suc_spawn_plant_reader: EventReader<SuccessSpawnPlantEvent>,
     mut fail_spawn_plant_reader: EventReader<FailedSpawnPlantEvent>,
     mut despawn_plant_reader: EventReader<DespawnPlantEvent>,
@@ -268,7 +268,7 @@ fn card_plant_event(
     }
 }
 
-fn shovel_click_system(
+pub fn shovel_click_system(
     mut interaction_query: Query<
         (&Interaction, &mut Visibility),
         (Changed<Interaction>, With<Button>, With<ShovelUI>),
@@ -301,7 +301,7 @@ fn shovel_click_system(
     }
 }
 
-fn shovel_plant_event(
+pub fn shovel_plant_event(
     mut despawn_plant_reader: EventReader<DespawnPlantEvent>,
     mut interaction_query: Query<&mut Visibility, (With<Button>, With<ShovelUI>)>,
 ) {

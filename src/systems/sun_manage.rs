@@ -1,11 +1,9 @@
-use bevy::{
-    prelude::*,
-};
+use bevy::prelude::*;
 use rand::Rng;
 
-use crate::{model::sun::*, view::get_sprites::get_sun_sprite};
 use crate::model::sun_events::*;
 use crate::{config::*, model::plant_events::SuccessSpawnPlantEvent};
+use crate::{model::sun::*, view::get_sprites::get_sun_sprite};
 
 pub struct SunPlugin;
 impl Plugin for SunPlugin {
@@ -22,13 +20,12 @@ impl Plugin for SunPlugin {
             .add_systems(Update, sun_despawn_with_time)
             .add_systems(Update, flower_produce_sun)
             .add_systems(Update, sun_fall_system)
-            .add_systems(Update, flower_sun_fall_system)
-            ;
+            .add_systems(Update, flower_sun_fall_system);
     }
 }
 
 /// 自然生成阳光
-fn sun_produce_sun(
+pub fn sun_produce_sun(
     // mut sun_amount: ResMut<SunAmount>,
     time: Res<Time>,
     game_config: Res<GameConfig>,
@@ -41,7 +38,7 @@ fn sun_produce_sun(
     if timer.just_finished() {
         let x: f32 = rng.random_range(0.0..8.0);
         let y: f32 = rng.random_range(0.0..4.0);
-        
+
         let sun_position = grid2pixel(*game_config, x, y, 10.0);
         let start_position = Vec3::new(sun_position.x, 500., sun_position.z);
 
@@ -64,7 +61,7 @@ fn sun_produce_sun(
     }
 }
 
-fn flower_produce_sun(
+pub fn flower_produce_sun(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     mut sunflower_produce_reader: EventReader<SpawnFlowerSunEvent>,
@@ -93,7 +90,7 @@ fn flower_produce_sun(
     }
 }
 
-fn sun_add(
+pub fn sun_add(
     mut sun_amount: ResMut<SunAmount>,
     mut pickup_sun_reader: EventReader<PickupSunEvent>,
     mut sun_change_writer: EventWriter<SunChangeEvent>,
@@ -104,7 +101,7 @@ fn sun_add(
     }
 }
 
-fn sun_consume(
+pub fn sun_consume(
     mut sun_amount: ResMut<SunAmount>,
     mut suc_spawn_plant_reader: EventReader<SuccessSpawnPlantEvent>,
     mut sun_change_writer: EventWriter<SunChangeEvent>,
@@ -115,7 +112,7 @@ fn sun_consume(
     }
 }
 
-fn sun_despawn_with_time(
+pub fn sun_despawn_with_time(
     mut commands: Commands,
     time: Res<Time>,
     mut query: Query<(Entity, &mut SunDespawnTimer), With<Sun>>,
@@ -127,8 +124,7 @@ fn sun_despawn_with_time(
     }
 }
 
-
-fn sun_fall_system(
+pub fn sun_fall_system(
     mut sun_query: Query<(&mut Transform, &mut FallTimer, &SunDrop), With<FallingSun>>,
     time: Res<Time>,
 ) {
@@ -139,7 +135,7 @@ fn sun_fall_system(
     }
 }
 
-fn flower_sun_fall_system(
+pub fn flower_sun_fall_system(
     mut sun_query: Query<(&mut Transform, &mut FlowerSunTimer, &FlowerSunDrop), With<FlowerSun>>,
     time: Res<Time>,
 ) {
@@ -152,15 +148,15 @@ fn flower_sun_fall_system(
         let x_end = sun_drop.end.x;
         let z = sun_drop.start.z;
 
-        let x_max = 1./2. * x_start + 1./2. * x_end;
-        
+        let x_max = 1. / 2. * x_start + 1. / 2. * x_end;
+
         let a = -0.1;
         let b = -2. * a * x_max;
         let c = y_start - a * x_start * x_start - b * x_start;
 
         let x_pos = t * (x_end - x_start) + x_start;
         let y_pos = a * x_pos * x_pos + b * x_pos + c;
-        
+
         transform.translation = Vec3::new(x_pos, y_pos, z);
     }
 }

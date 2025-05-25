@@ -1,28 +1,97 @@
 use bevy::prelude::*;
 
+use crate::config::*;
+use crate::model::plant::*;
+use crate::model::plant_events::*;
+use crate::model::projectile_events::*;
+use crate::model::sun::*;
+use crate::model::sun_events::*;
+use crate::model::zombie::*;
+use crate::model::zombie_events::*;
+
+use crate::view::play_animation::*;
+use crate::view::pvz_ui::*;
+
+use crate::systems::collision_check::*;
+use crate::systems::keyboard_control::*;
+use crate::systems::plant_manage::*;
+use crate::systems::projectile_manage::*;
+use crate::systems::sun_manage::*;
+use crate::systems::zombie_manage::*;
+
+use crate::model::events::PeaHitZombieEvent;
 use crate::model::tile::Lawn;
 use crate::systems::camera::setup_camera;
 use crate::systems::lawn::setup_lawn;
-use crate::config::*;
 use crate::systems::mouse_control::handle_clicks;
-use crate::systems::plant_manage::PlantPlugin;
-use crate::systems::sun_manage::SunPlugin;
-use crate::systems::zombie_manage::ZombiePlugin;
-use crate::view::pvz_ui::*;
-use crate::systems::projectile_manage::ProjectilePlugin;
 
 pub fn run() {
     App::new()
         .add_plugins(DefaultPlugins)
+        // Configurations
         .insert_resource(Lawn::default())
-        .add_plugins(ConfigPlugin)
-        .add_plugins(PlantPlugin)
-        .add_plugins(SunPlugin)
-        .add_plugins(MyUIPlugin)
-        .add_plugins(ProjectilePlugin)
-        .add_plugins(ZombiePlugin)
+        .insert_resource(GameConfig::default())
+        .insert_resource(GameType::default())
+        .insert_resource(ControlState::default())
+        .insert_resource(PlantType::default())
+        .insert_resource(WindowResolution::default())
+        .add_systems(Startup, setup_window_size)
+        // basic systems
         .add_systems(Startup, setup_camera)
         .add_systems(Startup, setup_lawn)
         .add_systems(Update, handle_clicks)
+        // UI management
+        .add_systems(Startup, setup_bank_ui)
+        .add_systems(Update, update_sun_bank_ui)
+        .add_systems(Update, card_click_system)
+        .add_systems(Update, card_plant_event)
+        .add_systems(Update, shovel_click_system)
+        .add_systems(Update, shovel_plant_event)
+        // Plant management
+        .insert_resource(PlantCost::default())
+        .add_event::<SpawnPlantEvent>()
+        .add_event::<DespawnPlantEvent>()
+        .add_event::<SuccessSpawnPlantEvent>()
+        .add_event::<FailedSpawnPlantEvent>()
+        .add_event::<SpawnFlowerSunEvent>()
+        .add_systems(Update, spawn_plant)
+        // TODO：检查shovel和僵尸的伤害，还是统一让生命归0提供一个收集器发送事件呢？
+        .add_systems(Update, despawn_plant)
+        .add_systems(Update, sunflower_produce)
+        .add_systems(Update, peashooter_shoot)
+        .add_systems(Update, play_plant_animation)
+        // Sun management
+        .insert_resource(GlobalSunTimer::default())
+        .insert_resource(SunAmount::default())
+        .add_event::<PickupSunEvent>()
+        .add_event::<SpawnFlowerSunEvent>()
+        .add_event::<SunChangeEvent>()
+        .add_systems(Update, sun_produce_sun)
+        .add_systems(Update, sun_add)
+        .add_systems(Update, sun_consume)
+        .add_systems(Update, sun_despawn_with_time)
+        .add_systems(Update, flower_produce_sun)
+        .add_systems(Update, sun_fall_system)
+        .add_systems(Update, flower_sun_fall_system)
+        // Projectile Zombie management
+        .add_event::<PeaSpawnEvent>()
+        .add_event::<ZombieSpawnEvent>()
+        .add_event::<PeaHitZombieEvent>()
+        .add_systems(Update, keyboard_spawn_zombie)
+        .add_systems(
+            Update,
+            (
+                spawn_pea,
+                move_pea,
+                spawn_zombie,
+                zombie_move,
+                detect_pea_zombie_collision,
+                handle_pea_hit_zombie,
+                time_despawn_pea,
+                despawn_zombie
+            ),
+        )
+        // TODO: 加一个僵尸回收器
+        .add_systems(Update, play_zombie_animation)
         .run();
 }

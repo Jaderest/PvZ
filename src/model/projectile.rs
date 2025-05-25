@@ -19,10 +19,24 @@ impl Velocity {
 #[derive(Component)]
 pub struct ProjRow(pub u32);
 
-#[derive(Component)]
-pub struct ProjDamage {
-    pub damage: f32,
+#[derive(Component, Deref, DerefMut)]
+pub struct Hit(pub bool);
+impl Default for Hit {
+    fn default() -> Self {
+        Self(false)
+    }
 }
+impl Hit {
+    pub fn is_hit(&self) -> bool {
+        self.0
+    }
+    pub fn set_hit(&mut self, hit: bool) {
+        self.0 = hit;
+    }
+}
+
+#[derive(Component)]
+pub struct ProjDamage(pub f32);
 
 #[derive(Component, Deref, DerefMut)]
 pub struct ProjLife(Timer);

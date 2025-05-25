@@ -5,22 +5,10 @@ use crate::model::projectile::*;
 use crate::model::projectile_events::*;
 use crate::view::get_sprites::*;
 
-
-pub struct ProjectilePlugin;
-impl Plugin for ProjectilePlugin {
-    fn build(&self, app: &mut App) {
-        app.add_event::<SpawnPeaEvent>()
-            .add_systems(Update, spawn_pea)
-            .add_systems(Update, move_pea)
-            .add_systems(Update, despawn_pea)
-            ;
-    }
-}
-
-fn spawn_pea(
+pub fn spawn_pea(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
-    mut spawn_pea_event_reader: EventReader<SpawnPeaEvent>,
+    mut spawn_pea_event_reader: EventReader<PeaSpawnEvent>,
 ) {
     for event in spawn_pea_event_reader.read() {
         let row = event.start_grid.y();
@@ -35,14 +23,16 @@ fn spawn_pea(
                 scale: Vec3::splat(2.),
                 ..default()
             },
+            Hit::default(),
             ProjRow(row),
+            ProjDamage(event.damage),
             Velocity::get_pea(),
             ProjLife::default(),
         ));
     }
 }
 
-fn move_pea(
+pub fn move_pea(
     mut pea_query: Query<(&mut Transform, &Velocity), With<Pea>>,
     time: Res<Time>,
 ) {
@@ -52,7 +42,7 @@ fn move_pea(
     }
 }
 
-fn despawn_pea(
+pub fn time_despawn_pea(
     mut commands: Commands,
     mut pea_query: Query<(Entity, &mut ProjLife), With<Pea>>,
     time: Res<Time>,
@@ -60,6 +50,7 @@ fn despawn_pea(
     for (entity, mut life) in pea_query.iter_mut() {
         life.tick(time.delta());
         if life.finished() {
+            info!("Life finished for pea entity: {:?}", entity);
             commands.entity(entity).despawn();
         }
     }

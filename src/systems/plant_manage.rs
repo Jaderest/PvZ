@@ -7,7 +7,7 @@ use crate::model::sun::Sun;
 use crate::model::sun::SunAmount;
 use crate::model::sun_events::SpawnFlowerSunEvent;
 use crate::model::tile::Lawn;
-use crate::model::projectile_events::SpawnPeaEvent;
+use crate::model::projectile_events::PeaSpawnEvent;
 
 use crate::config::*;
 use crate::model::components::*;
@@ -15,7 +15,7 @@ use crate::model::plant_events::*;
 use crate::model::tile::{Child, Tile};
 use crate::model::zombie::*;
 use crate::view::get_sprites::*;
-use crate::view::plant_animation::*;
+use crate::view::play_animation::*;
 
 pub struct PlantPlugin;
 impl Plugin for PlantPlugin {
@@ -38,7 +38,7 @@ impl Plugin for PlantPlugin {
 }
 
 // 根据事件，读取全局状态来生成植物
-fn spawn_plant(
+pub fn spawn_plant(
     mut commands: Commands,
     lawn: ResMut<Lawn>,
     plant_type: Res<PlantType>,
@@ -177,7 +177,7 @@ fn spawn_plant_entity(
     }
 }
 
-fn despawn_plant(
+pub fn despawn_plant(
     mut commands: Commands,
     lawn: ResMut<Lawn>,
     mut events: EventReader<DespawnPlantEvent>,
@@ -204,7 +204,7 @@ fn despawn_plant(
 }
 
 /// 向日葵计时，并生成阳光
-fn sunflower_produce(
+pub fn sunflower_produce(
     game_config: Res<GameConfig>,
     time: Res<Time>,
     mut sunflower_query: Query<(&mut Sunflower, &GridPosition, &Transform)>,
@@ -231,11 +231,11 @@ fn sunflower_produce(
     }
 }
 
-fn peashooter_shoot(
+pub fn peashooter_shoot(
     time: Res<Time>,
     mut peashooter_query: Query<(&mut PeaShooter, &GridPosition, &Transform), With<Plant>>,
     zombie_query: Query<&ZombiePosition>,
-    mut spawn_pea_writer: EventWriter<SpawnPeaEvent>,
+    mut spawn_pea_writer: EventWriter<PeaSpawnEvent>,
 ) {
     for (mut peashooter, grid_position, transform) in peashooter_query.iter_mut() {
         peashooter.fire_interval.tick(time.delta());
@@ -248,17 +248,13 @@ fn peashooter_shoot(
             let plant_x = grid_position.x() as f32; // 植物的x坐标
             if peashooter.fire_interval.just_finished() && zombie_x > plant_x {
                 // 如果植物的射击间隔刚好结束，并且僵尸在植物的右侧
-                spawn_pea_writer.write(SpawnPeaEvent {
+                spawn_pea_writer.write(PeaSpawnEvent {
                     start: transform.translation,
                     start_grid: *grid_position,
+                    damage: peashooter.damage,
                 });
+                break; // 有僵尸就射击，不能重复射击
             }
         }
-        // if peashooter.fire_interval.just_finished() {
-        //     spawn_pea_writer.write(SpawnPeaEvent {
-        //         start: transform.translation,
-        //         start_grid: *grid_position,
-        //     });
-        // }
     }
 }

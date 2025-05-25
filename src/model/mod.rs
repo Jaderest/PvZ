@@ -1,5 +1,6 @@
 pub mod tile;
 pub mod components;
+pub mod events;
 pub mod plant;
 pub mod plant_events;
 pub mod sun;

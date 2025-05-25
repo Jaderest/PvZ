@@ -14,7 +14,7 @@ impl Plugin for ConfigPlugin {
 }
 
 #[derive(Resource, Clone, Copy)]
-enum GameType {
+pub enum GameType {
     DayTimeGrass,
     NightTimeGrass,
     DayTimeWater,
@@ -58,7 +58,7 @@ impl Default for PlantType {
 }
 
 #[derive(Resource)]
-struct WindowResolution {
+pub struct WindowResolution {
     large: Vec2,
     medium: Vec2,
     small: Vec2,
@@ -94,7 +94,7 @@ impl Default for GameConfig {
     }
 }
 
-fn setup_window_size(mut window: Single<&mut Window>, resolution: Res<WindowResolution>) {
+pub fn setup_window_size(mut window: Single<&mut Window>, resolution: Res<WindowResolution>) {
     let res = resolution.medium;
     window.resolution.set(res.x, res.y);
     window.resizable = false;
