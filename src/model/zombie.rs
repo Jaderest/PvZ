@@ -3,6 +3,9 @@ use bevy::prelude::*;
 #[derive(Component)]
 pub struct Zombie;
 
+// TODO：使用defender创建路障僵尸
+// TODO：使用新标记创建路障僵尸
+
 #[derive(Component, Debug)]
 pub struct ZombiePosition {
     pub x: f32,
@@ -77,8 +80,23 @@ impl ZombieTargetPlant {
 
 #[derive(Component, Debug)]
 pub struct ZombieHealth {
-    pub current: f32,
-    pub max: f32,
+    current: f32,
+    max: f32,
+}
+impl ZombieHealth {
+    pub fn new(max: f32) -> Self {
+        Self {
+            current: max,
+            max,
+        }
+    }
+    pub fn receive_damage(&mut self, damage: f32) -> bool {
+        self.current -= damage;
+        return self.current <= 0.0;
+    }
+    pub fn is_dead(&self) -> bool {
+        self.current <= 0.0
+    }
 }
 
 #[derive(Component, Debug)]
@@ -91,11 +109,46 @@ pub enum ZombieDefender {
     Some(Defender),
     None,
 }
+impl Default for ZombieDefender {
+    fn default() -> Self {
+        Self::None
+    }
+}
+impl ZombieDefender {
+    pub fn get_defender(&mut self) -> Option<&mut Defender> {
+        match self {
+            Self::Some(defender) => Some(defender),
+            Self::None => None,
+        }
+    }
+    pub fn clear_defender(&mut self) {
+        *self = Self::None;
+    }
+    pub fn conehead() -> Self {
+        Self::Some(Defender::new_conehead())
+    }
+    pub fn normal() -> Self {
+        Self::None
+    }
+    // 如果要扩展在游戏过程中为所有僵尸添加防具，那么可以在这里加
+}
 
 #[derive(Component, Debug)]
 pub struct Defender {
     pub defender: DefenderType,
     pub health: f32,
+}
+impl Defender {
+    pub fn new_conehead() -> Self {
+        Self {
+            defender: DefenderType::Cone,
+            health: 100.0,
+        }
+    }
+    pub fn receive_damage(&mut self, damage: f32) -> bool {
+        self.health -= damage;
+        return self.health <= 0.0;
+    }
 }
 
 #[derive(Component, Debug)]

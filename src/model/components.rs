@@ -61,4 +61,53 @@ impl UiTimer {
             max_index: 30,
         }
     }
+    pub fn zombie_attack() -> Self {
+        Self {
+            timer: Timer::from_seconds(0.1, TimerMode::Repeating),
+            index: 0,
+            max_index: 20,
+        }
+    }
+    pub fn zombie_conehead() -> Self {
+        Self {
+            timer: Timer::from_seconds(0.175714, TimerMode::Repeating),
+            index: 0,
+            max_index: 20,
+        }
+    }
+    pub fn zombie_conehead_attack() -> Self {
+        Self {
+            timer: Timer::from_seconds(0.1, TimerMode::Repeating),
+            index: 0,
+            max_index: 10,
+        }
+    }
+    pub fn zombie_polevaulting_walk() -> Self {
+        Self {
+            timer: Timer::from_seconds(0.2, TimerMode::Repeating),
+            index: 0,
+            max_index: 24,
+        }
+    }
+    pub fn zombie_polevaulting_run() -> Self {
+        Self {
+            timer: Timer::from_seconds(0.1, TimerMode::Repeating),
+            index: 0,
+            max_index: 10,
+        }
+    }
+    pub fn zombie_polevaulting_jump1() -> Self {
+        Self {
+            timer: Timer::from_seconds(0.1, TimerMode::Repeating),
+            index: 0,
+            max_index: 9,
+        }
+    }
+    pub fn zombie_polevaulting_jump2() -> Self {
+        Self {
+            timer: Timer::from_seconds(0.1, TimerMode::Repeating),
+            index: 0,
+            max_index: 6,
+        }
+    }
 }

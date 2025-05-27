@@ -4,12 +4,15 @@ use bevy::{
     prelude::*,
 };
 
-use crate::config::GameConfig;
-use crate::model::components::*;
+use crate::{model::components::*, view::get_sprites::get_zombie_attack_sprite};
 use crate::model::plant::*;
 use crate::model::projectile::*;
 use crate::model::zombie::*;
 use crate::model::{events::*, zombie};
+use crate::{
+    config::GameConfig, model::zombie_events::ZombieDefenderBrokenEvent,
+    view::get_sprites::get_conehead_zombie_attack_sprite,
+};
 
 pub fn detect_pea_zombie_collision(
     mut pea_query: Query<(Entity, &ProjDamage, &Transform, &ProjRow, &mut Hit), With<Pea>>,
@@ -50,12 +53,20 @@ fn pea_collision(pea: BoundingCircle, zombie: Aabb2d) -> bool {
 pub fn handle_pea_hit_zombie(
     mut commands: Commands,
     mut events_reader: EventReader<PeaHitZombieEvent>,
-    mut zombie_query: Query<&mut ZombieHealth, With<Zombie>>,
+    mut defender_break_events_writer: EventWriter<ZombieDefenderBrokenEvent>,
+    mut zombie_query: Query<(&mut ZombieHealth, &mut ZombieDefender), With<Zombie>>,
 ) {
     for event in events_reader.read() {
-        if let Ok(mut zombie_health) = zombie_query.get_mut(event.zombie) {
-            zombie_health.current -= event.damage;
-            info!("zombie {}, health: {}", event.zombie, zombie_health.current);
+        if let Ok((mut zombie_health, mut zombie_defender)) = zombie_query.get_mut(event.zombie) {
+            if let Some(defender) = zombie_defender.get_defender() {
+                if defender.receive_damage(event.damage) {
+                    defender_break_events_writer.write(ZombieDefenderBrokenEvent {
+                        zombie: event.zombie,
+                    });
+                }
+            } else {
+                zombie_health.receive_damage(event.damage);
+            }
         }
         commands.entity(event.pea).despawn();
 
@@ -101,26 +112,57 @@ pub fn detect_zombie_plant_collision(
     }
 }
 
-// 哦对你是事件驱动，没发送事件给你
+// 处理僵尸与植物碰撞事件
+// 僵尸在碰撞到植物时，切换状态为攻击状态，并设置目标植物
 pub fn handle_zombie_collide_plant(
+    mut commands: Commands,
     mut events_reader: EventReader<ZombieCollidePlantEvent>,
+    asset_server: Res<AssetServer>,
+    mut texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
     mut zombie_query: Query<
         (
             &mut ZombieBehavior,
             &mut ZombieAtkTimer,
             &mut ZombieTargetPlant,
+            &mut ZombieDefender,
         ),
         With<Zombie>,
     >,
 ) {
     for event in events_reader.read() {
-        if let Ok((mut zombie_behavior, mut zombie_atk_timer, mut zombie_target)) =
-            zombie_query.get_mut(event.zombie)
+        if let Ok((
+            mut zombie_behavior,
+            mut zombie_atk_timer,
+            mut zombie_target,
+            mut zombie_defender,
+        )) = zombie_query.get_mut(event.zombie)
         {
             if zombie_behavior.is_walk() {
                 zombie_behavior.set_to(event.zombie_behavior);
                 zombie_target.set_target(event.plant);
                 zombie_atk_timer.reset(); // 重置攻击计时器
+                // 切换贴图和uitimer
+                if let Some(defender) = zombie_defender.get_defender() {
+                    // 更新贴图
+                    commands
+                        .entity(event.zombie)
+                        .insert(get_conehead_zombie_attack_sprite(
+                            &asset_server,
+                            &mut texture_atlas_layouts,
+                        ));
+                    commands
+                        .entity(event.zombie)
+                        .insert(UiTimer::zombie_conehead_attack());
+                } else {
+                    // 更新贴图
+                    commands
+                        .entity(event.zombie)
+                        .insert(get_zombie_attack_sprite(
+                            &asset_server,
+                            &mut texture_atlas_layouts,
+                        ));
+                    commands.entity(event.zombie).insert(UiTimer::zombie_attack());
+                }
                 info!(
                     "Zombie {} changes behavior to {:?} for plant {}",
                     event.zombie, zombie_behavior, event.plant
@@ -147,13 +189,8 @@ pub fn zombie_attack_plant(
     mut plant_receive_dmg_event_writer: EventWriter<PlantReceiveDamageEvent>,
     mut zombie_target_not_exist_event_writer: EventWriter<ZombieTargetNotExistEvent>,
 ) {
-    for (
-        zombie_entity,
-        zombie_behavior,
-        mut zombie_atk_timer,
-        zombie_target,
-        zombie_damage,
-    ) in zombie_query.iter_mut()
+    for (zombie_entity, zombie_behavior, mut zombie_atk_timer, zombie_target, zombie_damage) in
+        zombie_query.iter_mut()
     {
         if zombie_behavior.is_attack() {
             if let Some(plant_entity) = zombie_target.get_target() {
@@ -187,5 +224,3 @@ pub fn zombie_attack_plant(
         }
     }
 }
-
-// TODO: 检查僵尸攻击植物是否还在，似了就恢复zombie状态

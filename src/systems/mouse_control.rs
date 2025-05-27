@@ -35,14 +35,6 @@ pub fn handle_clicks(
         .viewport_to_world(camera_transform, cursor_position)
         .unwrap()
         .origin;
-    // 写状态切换 -
-    // 写向日葵 & 植物ui（学习一下Sprite UI）-
-    // 写阳光运动逻辑 -
-    // 写抛射物
-    // 写僵尸生成
-    // 僵尸运动逻辑
-    // 写植物攻击逻辑
-    // 写僵尸攻击逻辑
     match *control_state {
         ControlState::Normal => {
             // 处理植物点击事件

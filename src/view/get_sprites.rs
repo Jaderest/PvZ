@@ -111,6 +111,70 @@ fn get_zombie_sprite_1(
     }
 }
 
+pub fn get_conehead_zombie_sprite(
+    asset_server: &AssetServer,
+    texture_atlas_layouts: &mut Assets<TextureAtlasLayout>,
+) -> Sprite {
+    let layout = TextureAtlasLayout::from_grid(UVec2::new(166, 144), 21, 1, None, None);
+    let texture_atlas_layout = texture_atlas_layouts.add(layout);
+    Sprite {
+        image: asset_server.load("Zombies/ConeheadZombie.png"),
+        texture_atlas: Some(TextureAtlas {
+            layout: texture_atlas_layout.clone(),
+            index: 0,
+        }),
+        ..default()
+    }
+}
+
+pub fn get_zombie_attack_sprite(
+    asset_server: &AssetServer,
+    texture_atlas_layouts: &mut Assets<TextureAtlasLayout>,
+) -> Sprite {
+    let layout = TextureAtlasLayout::from_grid(UVec2::new(166, 144), 21, 1, None, None);
+    let texture_atlas_layout = texture_atlas_layouts.add(layout);
+    Sprite {
+        image: asset_server.load("Zombies/ZombieAttack.png"),
+        texture_atlas: Some(TextureAtlas {
+            layout: texture_atlas_layout.clone(),
+            index: 0,
+        }),
+        ..default()
+    }
+}
+
+pub fn get_conehead_zombie_attack_sprite(
+    asset_server: &AssetServer,
+    texture_atlas_layouts: &mut Assets<TextureAtlasLayout>,
+) -> Sprite {
+    let layout = TextureAtlasLayout::from_grid(UVec2::new(166, 144), 11, 1, None, None);
+    let texture_atlas_layout = texture_atlas_layouts.add(layout);
+    Sprite {
+        image: asset_server.load("Zombies/ConeheadZombieAttack.png"),
+        texture_atlas: Some(TextureAtlas {
+            layout: texture_atlas_layout.clone(),
+            index: 0,
+        }),
+        ..default()
+    }
+}
+
+pub fn get_polevaulting_zombie_sprite(
+    asset_server: &AssetServer,
+    texture_atlas_layouts: &mut Assets<TextureAtlasLayout>,
+) -> Sprite {
+    let layout = TextureAtlasLayout::from_grid(UVec2::new(166, 144), 21, 1, None, None);
+    let texture_atlas_layout = texture_atlas_layouts.add(layout);
+    Sprite {
+        image: asset_server.load("Zombies/PoleVaultingZombie.png"),
+        texture_atlas: Some(TextureAtlas {
+            layout: texture_atlas_layout.clone(),
+            index: 0,
+        }),
+        ..default()
+    }
+}
+
 pub fn get_sunflower_card_imagenode(
     asset_server: &AssetServer,
     texture_atlas_layouts: &mut Assets<TextureAtlasLayout>,

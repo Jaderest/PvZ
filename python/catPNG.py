@@ -44,5 +44,5 @@ def concat_images_horizontally(folder_path, output_path='output.png'):
 # 🧪 示例使用
 # 请替换为你自己的路径
 if __name__ == '__main__':
-    folder = 'C:/Users/Jade/Downloads/Zombie2'
-    concat_images_horizontally(folder, 'Zombie2.png')
+    folder = 'C:/Users/Jade/Downloads/ConeheadZombieAttack'
+    concat_images_horizontally(folder, 'ConeheadZombieAttack.png')

@@ -9,7 +9,6 @@ impl Plugin for ConfigPlugin {
             .insert_resource(PlantType::default())
             .insert_resource(WindowResolution::default())
             .add_systems(Startup, setup_window_size);
-        //TODO: 设定一下window size
     }
 }
 

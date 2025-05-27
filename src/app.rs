@@ -7,7 +7,6 @@ use crate::model::plant_events::*;
 use crate::model::projectile_events::*;
 use crate::model::sun::*;
 use crate::model::sun_events::*;
-use crate::model::zombie::*;
 use crate::model::zombie_events::*;
 use crate::model::events::*;
 
@@ -81,6 +80,7 @@ pub fn run() {
         .add_event::<PeaSpawnEvent>()
         .add_event::<ZombieSpawnEvent>()
         .add_event::<PeaHitZombieEvent>()
+        .add_event::<ZombieDefenderBrokenEvent>()
         .add_systems(Update, keyboard_spawn_zombie)
         .add_systems(
             Update,
@@ -91,6 +91,7 @@ pub fn run() {
                 zombie_move,
                 detect_pea_zombie_collision,
                 handle_pea_hit_zombie,
+                break_zombie_defender,
                 time_despawn_pea,
                 despawn_zombie
             ),
@@ -107,5 +108,7 @@ pub fn run() {
             plant_receive_damage,
         ))
         .add_systems(Update, play_zombie_animation)
+        // TODO：多种僵尸设计
+        // TODO: 游戏判定，游戏暂停
         .run();
 }
