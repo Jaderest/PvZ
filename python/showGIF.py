@@ -1,6 +1,6 @@
 from PIL import Image, ImageSequence
 
-img = Image.open("C:/Users/Jade/Downloads/e23bb-main/663/images/Zombies/Zombie/ZombieAttack.gif")
+img = Image.open("C:/Users/Jade/Downloads/e23bb-main/663/images/Zombies/PoleVaultingZombie/PoleVaultingZombieAttack.gif")
 duration = 0
 
 for frame in ImageSequence.Iterator(img):

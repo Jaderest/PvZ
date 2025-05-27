@@ -4,6 +4,8 @@ use crate::model::events::*;
 use crate::model::zombie::*;
 use crate::model::zombie_events::*;
 use crate::view::get_sprites::get_conehead_zombie_sprite;
+use crate::view::get_sprites::get_polevaulting_zombie_sprite;
+use crate::view::get_sprites::get_polevaulting_zombie_walk_sprite;
 use crate::view::get_sprites::get_zombie_attack_sprite;
 use crate::view::get_sprites::get_zombie_sprite;
 use bevy::prelude::*;
@@ -36,7 +38,15 @@ pub fn spawn_zombie(
                     &game_config,
                 );
             }
-            ZombieType::PoleVaulting => {}
+            ZombieType::PoleVaulting => {
+                spawn_pole_vaulting_zombie_entity(
+                    event.y,
+                    &mut commands,
+                    &asset_server,
+                    &mut texture_atlas_layouts,
+                    &game_config,
+                );
+            }
         }
     }
 }
@@ -129,41 +139,44 @@ fn spawn_conehead_zombie_entity(
     ));
 }
 
-// fn spawn_pole_vaulting_zombie_entity(
-//     y: u32,
-//     commands: &mut Commands,
-//     asset_server: &AssetServer,
-//     mut texture_atlas_layouts: &mut Assets<TextureAtlasLayout>,
-//     game_config: &GameConfig,
-// ) {
-//     let zombie_position = ZombiePosition::new(8.5, y);
-//     let mut zombie_translation = grid2pixel(
-//         *game_config,
-//         zombie_position.x,
-//         zombie_position.y as f32,
-//         7. - y as f32 * 0.1,
-//     );
-//     zombie_translation.y += 60.0;
+fn spawn_pole_vaulting_zombie_entity(
+    y: u32,
+    commands: &mut Commands,
+    asset_server: &AssetServer,
+    mut texture_atlas_layouts: &mut Assets<TextureAtlasLayout>,
+    game_config: &GameConfig,
+) {
+    let zombie_position = ZombiePosition::new(8.5, y);
+    let mut zombie_translation = grid2pixel(
+        *game_config,
+        zombie_position.x,
+        zombie_position.y as f32,
+        7. - y as f32 * 0.1,
+    );
+    zombie_translation.y += 60.0;
 
-//     commands.spawn((
-//         get_polevaulting_zombie_sprite(&asset_server, &mut texture_atlas_layouts),
-//         Zombie,
-//         zombie_position,
-//         ZombieSpeed { speed: 18. },
-//         ZombieBehavior::default(),
-//         ZombieAtkTimer::default(),
-//         ZombieTargetPlant::default(),
-//         ZombieHealth::new(100.0),
-//         ZombieDamage { damage: 10.0 },
-//         ZombieDefender::normal(),
-//         UiTimer::zombie_polevaulting_run(),
-//         Transform {
-//             translation: zombie_translation,
-//             scale: Vec3::splat(2.0),
-//             ..default()
-//         },
-//     ));
-// }
+    commands.spawn((
+        get_polevaulting_zombie_sprite(&asset_server, &mut texture_atlas_layouts),
+        Zombie,
+        zombie_position,
+        ZombieSpeed { speed: 25. },
+        //
+        ZombiePoleVaulting::default(),
+        //
+        ZombieBehavior::default(),
+        ZombieAtkTimer::default(),
+        ZombieTargetPlant::default(),
+        ZombieHealth::new(100.0),
+        ZombieDamage { damage: 10.0 },
+        ZombieDefender::normal(),
+        UiTimer::zombie_polevaulting_run(),
+        Transform {
+            translation: zombie_translation,
+            scale: Vec3::splat(1.8),
+            ..default()
+        },
+    ));
+}
 
 pub fn zombie_move(
     mut zombie_query: Query<(&mut Transform, &ZombieSpeed, &ZombieBehavior), With<Zombie>>,
@@ -193,7 +206,7 @@ pub fn zombie_recover_walk_system(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     mut texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
-    mut zombie_query: Query<(&mut ZombieBehavior, &mut ZombieTargetPlant), With<Zombie>>,
+    mut zombie_query: Query<(&mut ZombieBehavior, &mut ZombieTargetPlant), (With<Zombie>, Without<ZombiePoleVaulting>)>,
     mut zombie_target_not_exist_reader: EventReader<ZombieTargetNotExistEvent>,
 ) {
     for event in zombie_target_not_exist_reader.read() {
@@ -202,6 +215,8 @@ pub fn zombie_recover_walk_system(
                 *zombie_behavior = ZombieBehavior::Walk;
                 zombie_target.clear_target();
                 // 切换贴图
+                // TODO: 这里没考虑路障僵尸
+                // TODO：考虑撑杆跳
                 commands.entity(event.zombie).insert(UiTimer::zombie_type0());
                 commands.entity(event.zombie).insert(get_zombie_sprite(
                     &asset_server,
@@ -215,6 +230,35 @@ pub fn zombie_recover_walk_system(
             }
         } else {
             info!("Zombie {} not found for recovery", event.zombie);
+        }
+    }
+}
+
+pub fn zombie_pole_vaulting_recover_walk_system(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+    mut texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
+    mut zombie_query: Query<(&mut ZombieBehavior, &mut ZombieTargetPlant), With<ZombiePoleVaulting>>,
+    mut zombie_target_not_exist_reader: EventReader<ZombieTargetNotExistEvent>,
+) {
+    for event in zombie_target_not_exist_reader.read() {
+        if let Ok((mut zombie_behavior, mut zombie_target)) = zombie_query.get_mut(event.zombie) {
+            if zombie_behavior.is_attack() {
+                *zombie_behavior = ZombieBehavior::Walk;
+                zombie_target.clear_target();
+                // 切换贴图
+                commands.entity(event.zombie).insert(UiTimer::zombie_polevaulting_walk());
+                commands.entity(event.zombie).insert(get_polevaulting_zombie_walk_sprite(
+                    &asset_server,
+                    &mut texture_atlas_layouts,
+                ));
+                info!(
+                    "Pole Vaulting Zombie {} recovered to walk state, target not exists",
+                    event.zombie
+                );
+            }
+        } else {
+            info!("Pole Vaulting Zombie {} not found for recovery", event.zombie);
         }
     }
 }

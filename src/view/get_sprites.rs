@@ -163,10 +163,42 @@ pub fn get_polevaulting_zombie_sprite(
     asset_server: &AssetServer,
     texture_atlas_layouts: &mut Assets<TextureAtlasLayout>,
 ) -> Sprite {
-    let layout = TextureAtlasLayout::from_grid(UVec2::new(166, 144), 21, 1, None, None);
+    let layout = TextureAtlasLayout::from_grid(UVec2::new(348, 218), 10, 1, None, None);
     let texture_atlas_layout = texture_atlas_layouts.add(layout);
     Sprite {
         image: asset_server.load("Zombies/PoleVaultingZombie.png"),
+        texture_atlas: Some(TextureAtlas {
+            layout: texture_atlas_layout.clone(),
+            index: 0,
+        }),
+        ..default()
+    }
+}
+
+pub fn get_polevaulting_zombie_walk_sprite(
+    asset_server: &AssetServer,
+    texture_atlas_layouts: &mut Assets<TextureAtlasLayout>,
+) -> Sprite {
+    let layout = TextureAtlasLayout::from_grid(UVec2::new(348, 218), 24, 1, None, None);
+    let texture_atlas_layout = texture_atlas_layouts.add(layout);
+    Sprite {
+        image: asset_server.load("Zombies/PoleVaultingZombieWalk.png"),
+        texture_atlas: Some(TextureAtlas {
+            layout: texture_atlas_layout.clone(),
+            index: 0,
+        }),
+        ..default()
+    }
+}
+
+pub fn get_polevaulting_zombie_attack_sprite(
+    asset_server: &AssetServer,
+    texture_atlas_layouts: &mut Assets<TextureAtlasLayout>,
+) -> Sprite {
+    let layout = TextureAtlasLayout::from_grid(UVec2::new(348, 218), 14, 1, None, None);
+    let texture_atlas_layout = texture_atlas_layouts.add(layout);
+    Sprite {
+        image: asset_server.load("Zombies/PoleVaultingZombieAttack.png"),
         texture_atlas: Some(TextureAtlas {
             layout: texture_atlas_layout.clone(),
             index: 0,

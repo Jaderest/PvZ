@@ -110,4 +110,11 @@ impl UiTimer {
             max_index: 6,
         }
     }
+    pub fn zombie_pole_vaulting_attack() -> Self {
+        Self {
+            timer: Timer::from_seconds(0.1, TimerMode::Repeating),
+            index: 0,
+            max_index: 13,
+        }
+    }
 }

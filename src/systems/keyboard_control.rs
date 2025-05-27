@@ -14,7 +14,7 @@ pub fn keyboard_spawn_zombie(
         zombie_spawn_event_writer.write(ZombieSpawnEvent { y: 1, zombie_type: ZombieType::Conehead });
     }
     if keyboard_input.just_pressed(KeyCode::Numpad3) {
-        zombie_spawn_event_writer.write(ZombieSpawnEvent { y: 2, zombie_type: ZombieType::Zombie});
+        zombie_spawn_event_writer.write(ZombieSpawnEvent { y: 2, zombie_type: ZombieType::PoleVaulting });
     }
     if keyboard_input.just_pressed(KeyCode::Numpad4) {
         zombie_spawn_event_writer.write(ZombieSpawnEvent { y: 3, zombie_type: ZombieType::Zombie });

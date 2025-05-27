@@ -3,8 +3,24 @@ use bevy::prelude::*;
 #[derive(Component)]
 pub struct Zombie;
 
-// TODO：使用defender创建路障僵尸
-// TODO：使用新标记创建路障僵尸
+/// 属性之一：是否可以跳过第一个植物
+#[derive(Component, Debug)]
+pub struct ZombiePoleVaulting {
+    pub can_jump: bool,
+}
+impl Default for ZombiePoleVaulting {
+    fn default() -> Self {
+        Self { can_jump: true }
+    }
+}
+impl ZombiePoleVaulting {
+    pub fn can_jump(&mut self) -> bool {
+        self.can_jump
+    }
+    pub fn jump(&mut self) {
+        self.can_jump = false;
+    }
+}
 
 #[derive(Component, Debug)]
 pub struct ZombiePosition {

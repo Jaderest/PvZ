@@ -1,5 +1,4 @@
 use bevy::prelude::*;
-use bevy::scene::ron::de;
 
 use crate::config::*;
 use crate::model::plant::*;
@@ -89,6 +88,7 @@ pub fn run() {
                 move_pea,
                 spawn_zombie,
                 zombie_move,
+                handle_pole_vaulting_zombie_collide_plant,
                 detect_pea_zombie_collision,
                 handle_pea_hit_zombie,
                 break_zombie_defender,
@@ -105,6 +105,7 @@ pub fn run() {
             handle_zombie_collide_plant,
             zombie_attack_plant,
             zombie_recover_walk_system,
+            zombie_pole_vaulting_recover_walk_system,
             plant_receive_damage,
         ))
         .add_systems(Update, play_zombie_animation)
