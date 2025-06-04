@@ -17,10 +17,16 @@ impl ZombiePoleVaulting {
     pub fn can_jump(&mut self) -> bool {
         self.can_jump
     }
-    pub fn jump(&mut self) {
-        self.can_jump = false;
+    pub fn jumped() -> Self {
+        Self { can_jump: false }
     }
 }
+
+#[derive(Component, Debug)]
+pub struct ZombiePoleVaultingAni1;
+
+#[derive(Component, Debug)]
+pub struct ZombiePoleVaultingAni2;
 
 #[derive(Component, Debug)]
 pub struct ZombiePosition {
@@ -30,6 +36,12 @@ pub struct ZombiePosition {
 impl ZombiePosition {
     pub fn new(x: f32, y: u32) -> Self {
         Self { x, y }
+    }
+    pub fn from_zombie_position(position: &ZombiePosition) -> Self {
+        Self {
+            x: position.x,
+            y: position.y,
+        }
     }
 }
 
@@ -94,7 +106,7 @@ impl ZombieTargetPlant {
     }
 }
 
-#[derive(Component, Debug)]
+#[derive(Component, Debug, Clone, Copy)]
 pub struct ZombieHealth {
     current: f32,
     max: f32,
@@ -105,6 +117,15 @@ impl ZombieHealth {
             current: max,
             max,
         }
+    }
+    pub fn from_zombie_health(health: &ZombieHealth) -> Self {
+        Self {
+            current: health.current,
+            max: health.max,
+        }
+    }
+    pub fn current(&self) -> f32 {
+        self.current
     }
     pub fn receive_damage(&mut self, damage: f32) -> bool {
         self.current -= damage;

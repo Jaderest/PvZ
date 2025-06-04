@@ -66,7 +66,7 @@ impl Default for WindowResolution {
     fn default() -> Self {
         Self {
             large: Vec2::new(1920.0, 1080.0),
-            medium: Vec2::new(1300.0, 700.0),
+            medium: Vec2::new(1300.0, 800.0),
             small: Vec2::new(800.0, 600.0),
         }
     }
@@ -104,7 +104,7 @@ pub fn setup_window_size(mut window: Single<&mut Window>, resolution: Res<Window
 pub fn grid2pixel(game_config: GameConfig, grid_x: f32, gird_y: f32, z: f32) -> Vec3 {
     let tile_size = game_config.tile_size;
     let lawn_width = game_config.map_width as f32 * tile_size;
-    let bottom_edge_of_tile = -tile_size * (game_config.map_height as f32 - 2.5);
+    let bottom_edge_of_tile = -tile_size * (game_config.map_height as f32 - 2.2);
     let left_edge_of_tile = 0.0 - lawn_width / 2.2;
     let offset_x = left_edge_of_tile + tile_size / 2.0;
     let offset_y = bottom_edge_of_tile + tile_size / 2.0;
@@ -113,4 +113,15 @@ pub fn grid2pixel(game_config: GameConfig, grid_x: f32, gird_y: f32, z: f32) -> 
         y: offset_y + (gird_y * tile_size),
         z,
     }
+}
+
+pub fn pixel2gridx(game_config: GameConfig, pixel_x: f32) -> f32 {
+    let tile_size = game_config.tile_size;
+    let lawn_width = game_config.map_width as f32 * tile_size;
+    let left_edge_of_tile = 0.0 - lawn_width / 2.2;
+    let offset_x = left_edge_of_tile + tile_size / 2.0;
+
+    let grid_x = (pixel_x - offset_x) / tile_size;
+
+    grid_x
 }

@@ -9,6 +9,7 @@ use crate::model::sun_events::*;
 use crate::model::zombie_events::*;
 use crate::model::events::*;
 
+use crate::model::zombie_pole_vaulting::*;
 use crate::view::play_animation::*;
 use crate::view::pvz_ui::*;
 
@@ -81,6 +82,7 @@ pub fn run() {
         .add_event::<PeaHitZombieEvent>()
         .add_event::<ZombieDefenderBrokenEvent>()
         .add_systems(Update, keyboard_spawn_zombie)
+        //TODO：看一下可以并行化的部分
         .add_systems(
             Update,
             (
@@ -100,6 +102,9 @@ pub fn run() {
         .add_event::<ZombieCollidePlantEvent>()
         .add_event::<PlantReceiveDamageEvent>()
         .add_event::<ZombieTargetNotExistEvent>()
+        .add_event::<ZombiePoleJumpEvent>()
+        .add_event::<ZombiePoleJump2Event>()
+        .add_event::<ZombiePoleJumpEndEvent>()
         .add_systems(Update, (
             detect_zombie_plant_collision,
             handle_zombie_collide_plant,
@@ -109,7 +114,11 @@ pub fn run() {
             plant_receive_damage,
         ))
         .add_systems(Update, play_zombie_animation)
-        // TODO：多种僵尸设计
+        .add_systems(Update, spawn_pole_vaulting_animation_phase1)
+        .add_systems(Update, spawn_pole_vaulting_animation_phase2)
+        .add_systems(Update, play_pole_vaulting_jump1_animation)
+        .add_systems(Update, play_pole_vaulting_jump2_animation)
+        .add_systems(Update, spawn_pole_vaulting_zombie_walk)
         // TODO: 游戏判定，游戏暂停
         .run();
 }

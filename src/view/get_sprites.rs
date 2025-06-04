@@ -191,6 +191,38 @@ pub fn get_polevaulting_zombie_walk_sprite(
     }
 }
 
+pub fn get_polevaulting_zombie_jump_sprite(
+    asset_server: &AssetServer,
+    texture_atlas_layouts: &mut Assets<TextureAtlasLayout>,
+) -> Sprite {
+    let layout = TextureAtlasLayout::from_grid(UVec2::new(348, 218), 10, 1, None, None);
+    let texture_atlas_layout = texture_atlas_layouts.add(layout);
+    Sprite {
+        image: asset_server.load("Zombies/PoleVaultingZombieJump.png"),
+        texture_atlas: Some(TextureAtlas {
+            layout: texture_atlas_layout.clone(),
+            index: 0,
+        }),
+        ..default()
+    }
+}
+
+pub fn get_polevaulting_zombie_jump2_sprite(
+    asset_server: &AssetServer,
+    texture_atlas_layouts: &mut Assets<TextureAtlasLayout>,
+) -> Sprite {
+    let layout = TextureAtlasLayout::from_grid(UVec2::new(348, 218), 7, 1, None, None);
+    let texture_atlas_layout = texture_atlas_layouts.add(layout);
+    Sprite {
+        image: asset_server.load("Zombies/PoleVaultingZombieJump2.png"),
+        texture_atlas: Some(TextureAtlas {
+            layout: texture_atlas_layout.clone(),
+            index: 0,
+        }),
+        ..default()
+    }
+}
+
 pub fn get_polevaulting_zombie_attack_sprite(
     asset_server: &AssetServer,
     texture_atlas_layouts: &mut Assets<TextureAtlasLayout>,

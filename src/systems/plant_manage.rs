@@ -255,10 +255,13 @@ pub fn peashooter_shoot(
             }
             let zombie_x = zombie_position.x;
             let plant_x = grid_position.x() as f32; // 植物的x坐标
+            let mut translation = transform.translation;
+            translation.z = 5.0 - 0.01 * grid_position.y() as f32; // 确保植物在正确的z轴位置
+
             if peashooter.fire_interval.just_finished() && zombie_x > plant_x {
                 // 如果植物的射击间隔刚好结束，并且僵尸在植物的右侧
                 spawn_pea_writer.write(PeaSpawnEvent {
-                    start: transform.translation,
+                    start: translation,
                     start_grid: *grid_position,
                     damage: peashooter.damage,
                 });

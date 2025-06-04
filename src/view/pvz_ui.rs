@@ -194,7 +194,7 @@ pub fn card_click_system(
     >,
     mouse: Res<ButtonInput<MouseButton>>,
     mut plant_type: ResMut<PlantType>,
-    mut control_state: ResMut<ControlState>,
+    mut control_state: ResMut<ControlState>, // TODO：control_state多实现两种type或者想想怎么写扩展性好些？
 ) {
     for (interaction, mut image_node, card_plant_type) in interaction_query.iter_mut() {
         match *interaction {

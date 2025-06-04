@@ -2,17 +2,18 @@ use bevy::{
     ecs::event,
     math::bounding::{Aabb2d, BoundingCircle, BoundingVolume, IntersectsVolume},
     prelude::*,
+    transform,
 };
 
-use crate::{model::plant::*};
+use crate::model::components::*;
 use crate::model::projectile::*;
 use crate::model::zombie::*;
+use crate::model::zombie_pole_vaulting::*;
 use crate::model::{events::*, zombie};
 use crate::{
-    config::GameConfig, model::zombie_events::ZombieDefenderBrokenEvent,
-    view::get_sprites::*,
+    config::GameConfig, model::zombie_events::ZombieDefenderBrokenEvent, view::get_sprites::*,
 };
-use crate::{model::components::*};
+use crate::{config::pixel2gridx, model::plant::*};
 
 pub fn detect_pea_zombie_collision(
     mut pea_query: Query<(Entity, &ProjDamage, &Transform, &ProjRow, &mut Hit), With<Pea>>,
@@ -74,10 +75,6 @@ pub fn handle_pea_hit_zombie(
     }
 }
 
-// 僵尸攻击植物，给僵尸添加一个状态、Walk/Attack，然后根据这个判断僵尸走不走
-// 同时发送状态切换到Attack的事件，如果僵尸状态改变，换一次贴图和UiTimer，并且给僵尸添加一个攻击计时器，攻击植物
-// 那么怎么切换回来呢？
-// TODO：添加一个事件接收器，专门处理撑杆僵尸
 pub fn detect_zombie_plant_collision(
     game_config: Res<GameConfig>,
     mut plant_query: Query<(Entity, &Transform, &GridPosition), With<Plant>>,
@@ -143,7 +140,7 @@ pub fn handle_zombie_collide_plant(
                 zombie_target.set_target(event.plant);
                 zombie_atk_timer.reset(); // 重置攻击计时器
                 // 切换贴图和uitimer
-                if let Some(defender) = zombie_defender.get_defender() {
+                if let Some(_defender) = zombie_defender.get_defender() {
                     // 更新贴图
                     commands
                         .entity(event.zombie)
@@ -177,18 +174,23 @@ pub fn handle_zombie_collide_plant(
 
 pub fn handle_pole_vaulting_zombie_collide_plant(
     mut commands: Commands,
+    game_config: Res<GameConfig>,
     mut events_reader: EventReader<ZombieCollidePlantEvent>,
     asset_server: Res<AssetServer>,
     mut texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
-    mut zombie_query: Query<
+    mut zombie_query: Populated<
         (
             &mut ZombieBehavior,
             &mut ZombieAtkTimer,
             &mut ZombieTargetPlant,
             &mut ZombiePoleVaulting,
+            &mut ZombiePosition,
+            &ZombieHealth,
+            &Transform,
         ),
         With<ZombiePoleVaulting>,
     >,
+    mut zombie_pole_vaulting_jump_event_writer: EventWriter<ZombiePoleJumpEvent>,
 ) {
     for event in events_reader.read() {
         if let Ok((
@@ -196,26 +198,37 @@ pub fn handle_pole_vaulting_zombie_collide_plant(
             mut zombie_atk_timer,
             mut zombie_target,
             mut zombie_pole_vaulting,
+            zombie_position,
+            zombie_health,
+            zombie_transform,
         )) = zombie_query.get_mut(event.zombie)
         {
             if zombie_pole_vaulting.can_jump() {
-                //TODO: 添加撑杆跳逻辑
-                //TODO: 播放跳跃动画
-                //TODO: 更新僵尸位置
-                //TODO：更新僵尸速度 -
-                commands.entity(event.zombie).insert(ZombieSpeed {
-                    speed: 18.,
-                }); // 事实上这个得despawn
+                // 获取僵尸实体的位置
+                let grid_x = pixel2gridx(*game_config, zombie_position.x);
+                info!(
+                    "pole vaulting zombie {:?} jumps at grid_x: {}, y: {}",
+                    event.zombie, grid_x, zombie_transform.translation.y
+                );
+                zombie_pole_vaulting_jump_event_writer.write(ZombiePoleJumpEvent {
+                    y: zombie_position.y,
+                    health: zombie_health.clone(),
+                    translation: zombie_transform.translation,
+                });
+                commands.entity(event.zombie).despawn();
 
-                zombie_pole_vaulting.jump();
                 continue;
             }
             if zombie_behavior.is_walk() {
+                info!(
+                    "Pole Vaulting Zombie {:?} collides with plant {:?}",
+                    event.zombie, event.plant
+                );
                 zombie_behavior.set_to(event.zombie_behavior);
                 zombie_target.set_target(event.plant);
                 zombie_atk_timer.reset(); // 重置攻击计时器
+                
                 // 切换贴图和uitimer
-
                 commands
                     .entity(event.zombie)
                     .insert(get_polevaulting_zombie_attack_sprite(

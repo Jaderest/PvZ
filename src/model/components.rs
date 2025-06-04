@@ -98,14 +98,14 @@ impl UiTimer {
     }
     pub fn zombie_polevaulting_jump1() -> Self {
         Self {
-            timer: Timer::from_seconds(0.1, TimerMode::Repeating),
+            timer: Timer::from_seconds(1.0, TimerMode::Once),
             index: 0,
             max_index: 9,
         }
     }
     pub fn zombie_polevaulting_jump2() -> Self {
         Self {
-            timer: Timer::from_seconds(0.1, TimerMode::Repeating),
+            timer: Timer::from_seconds(0.7, TimerMode::Once),
             index: 0,
             max_index: 6,
         }

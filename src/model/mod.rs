@@ -9,3 +9,4 @@ pub mod projectile;
 pub mod projectile_events;
 pub mod zombie;
 pub mod zombie_events;
+pub mod zombie_pole_vaulting;
