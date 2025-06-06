@@ -2,6 +2,16 @@
 
 use bevy::prelude::*;
 
+// game_state
+#[derive(Clone, Copy, Default, Eq, PartialEq, Debug, Hash, States)]
+pub enum GameState {
+    #[default]
+    Menu,
+    Game,
+    Pause,
+    GameOver,
+}
+
 /// 位置
 #[derive(Component, Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub struct GridPosition {

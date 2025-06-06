@@ -1,4 +1,5 @@
 mod app;
+mod game;
 mod model;
 mod view;
 mod systems;
