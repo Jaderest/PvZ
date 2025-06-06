@@ -37,12 +37,6 @@ impl ZombiePosition {
     pub fn new(x: f32, y: u32) -> Self {
         Self { x, y }
     }
-    pub fn from_zombie_position(position: &ZombiePosition) -> Self {
-        Self {
-            x: position.x,
-            y: position.y,
-        }
-    }
 }
 
 #[derive(Component, Debug)]

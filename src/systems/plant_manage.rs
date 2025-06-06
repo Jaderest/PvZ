@@ -1,11 +1,8 @@
-use bevy::ecs::event;
-use bevy::gilrs;
 use bevy::prelude::*;
 use rand::Rng;
 
 use crate::model::plant::*;
 use crate::model::events::*;
-use crate::model::sun::Sun;
 use crate::model::sun::SunAmount;
 use crate::model::sun_events::SpawnFlowerSunEvent;
 use crate::model::tile::Lawn;
@@ -17,7 +14,6 @@ use crate::model::plant_events::*;
 use crate::model::tile::{Child, Tile};
 use crate::model::zombie::*;
 use crate::view::get_sprites::*;
-use crate::view::play_animation::*;
 
 // 根据事件，读取全局状态来生成植物
 pub fn spawn_plant(

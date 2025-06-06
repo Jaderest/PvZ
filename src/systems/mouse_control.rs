@@ -2,7 +2,7 @@ use bevy::{prelude::*, render::camera};
 
 use crate::config::*;
 use crate::model::plant_events::*;
-use crate::model::sun::{Sun, SunAmount};
+use crate::model::sun::Sun;
 use crate::model::sun_events::*;
 use crate::model::{components::GridPosition, tile::Tile};
 

@@ -70,7 +70,6 @@ fn spawn_zombie_entity(
     let zombie_speed = ZombieSpeed { speed: 18. };
     let zombie_damage = ZombieDamage { damage: 10.0 };
 
-    //TODO: 检查魔法数字
     zombie_translation.y += 60.0;
     let mut rng = rand::rng();
     let (zombie_sprite, zombie_type) = if rng.random_bool(0.5) {

@@ -42,12 +42,17 @@ impl Plugin for GamePlugin {
             .add_systems(Startup, setup_lawn)
             .add_systems(Update, handle_clicks)
             // UI management
+            .add_event::<ClearCardEvent>()
+            .add_event::<SetCardCDEvent>()
             .add_systems(Startup, setup_bank_ui)
             .add_systems(Update, update_sun_bank_ui)
             .add_systems(Update, card_click_system)
+            .add_systems(Update, clear_card_system)
             .add_systems(Update, card_plant_event)
             .add_systems(Update, shovel_click_system)
             .add_systems(Update, shovel_plant_event)
+            .add_systems(Update, card_cd_tick_system)
+            .add_systems(Update, card_cd_update_system)
             // Plant management
             .insert_resource(PlantCost::default())
             .add_event::<SpawnPlantEvent>()
@@ -125,8 +130,6 @@ impl Plugin for GamePlugin {
             .add_systems(Update, play_pole_vaulting_jump1_animation)
             .add_systems(Update, play_pole_vaulting_jump2_animation)
             .add_systems(Update, spawn_pole_vaulting_zombie_walk)
-            // TODO: 游戏判定&游戏暂停
-            // TODO: 卡槽冷却时间
             // TODO: 关卡生成
             ;
     }
