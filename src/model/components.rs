@@ -8,7 +8,7 @@ pub enum GameState {
     #[default]
     Menu,
     Game,
-    Pause,
+    Success,
     GameOver,
 }
 

@@ -74,7 +74,8 @@ impl Default for WindowResolution {
 
 #[derive(Resource, Clone, Copy)]
 pub struct GameConfig {
-    pub tile_size: f32,
+    pub tile_height: f32,
+    pub tile_width: f32,
     pub map_width: u32,
     pub map_height: u32,
     pub sun_size: f32,
@@ -84,7 +85,8 @@ pub struct GameConfig {
 impl Default for GameConfig {
     fn default() -> Self {
         Self {
-            tile_size: 160.0,
+            tile_height: 160.0,
+            tile_width: 129.0,
             map_width: 9,
             map_height: 5,
             sun_size: 64.0,
@@ -102,26 +104,27 @@ pub fn setup_window_size(mut window: Single<&mut Window>, resolution: Res<Window
 }
 
 pub fn grid2pixel(game_config: GameConfig, grid_x: f32, gird_y: f32, z: f32) -> Vec3 {
-    let tile_size = game_config.tile_size;
-    let lawn_width = game_config.map_width as f32 * tile_size;
-    let bottom_edge_of_tile = -tile_size * (game_config.map_height as f32 - 2.2);
-    let left_edge_of_tile = 0.0 - lawn_width / 2.2;
-    let offset_x = left_edge_of_tile + tile_size / 2.0;
-    let offset_y = bottom_edge_of_tile + tile_size / 2.0;
+    let tile_height = game_config.tile_height;
+    let tile_width = game_config.tile_width;
+    let lawn_width = game_config.map_width as f32 * tile_width;
+    let bottom_edge_of_tile = -tile_height * (game_config.map_height as f32 - 2.3);
+    let left_edge_of_tile = 0.0 - lawn_width / 2.2 - tile_width * 0.75;
+    let offset_x = left_edge_of_tile + tile_width / 2.0;
+    let offset_y = bottom_edge_of_tile + tile_height / 2.0;
     Vec3 {
-        x: offset_x + (grid_x * tile_size),
-        y: offset_y + (gird_y * tile_size),
+        x: offset_x + (grid_x * tile_width),
+        y: offset_y + (gird_y * tile_height),
         z,
     }
 }
 
 pub fn pixel2gridx(game_config: GameConfig, pixel_x: f32) -> f32 {
-    let tile_size = game_config.tile_size;
-    let lawn_width = game_config.map_width as f32 * tile_size;
+    let tile_width = game_config.tile_width;
+    let lawn_width = game_config.map_width as f32 * tile_width;
     let left_edge_of_tile = 0.0 - lawn_width / 2.2;
-    let offset_x = left_edge_of_tile + tile_size / 2.0;
+    let offset_x = left_edge_of_tile + tile_width / 2.0;
 
-    let grid_x = (pixel_x - offset_x) / tile_size;
+    let grid_x = (pixel_x - offset_x) / tile_width;
 
     grid_x
 }

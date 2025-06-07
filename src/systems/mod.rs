@@ -9,5 +9,6 @@ pub mod keyboard_control;
 
 pub mod projectile_manage;
 pub mod zombie_manage;
+pub mod level_manage;
 
 pub mod collision_check;

@@ -102,7 +102,7 @@ fn spawn_plant_entity(
                 GridPosition::new(grid_position.x(), grid_position.y()),
                 Transform {
                     translation: translation,
-                    scale: Vec3::splat(game_config.tile_size / 64.0),
+                    scale: Vec3::splat(game_config.tile_width / 64.0),
                     ..default()
                 },
                 PlantHealth {
@@ -121,7 +121,7 @@ fn spawn_plant_entity(
                 GridPosition::new(grid_position.x(), grid_position.y()),
                 Transform {
                     translation: translation,
-                    scale: Vec3::splat(game_config.tile_size / 64.0),
+                    scale: Vec3::splat(game_config.tile_width / 64.0),
                     ..default()
                 },
                 PlantHealth {
@@ -140,7 +140,7 @@ fn spawn_plant_entity(
                 GridPosition::new(grid_position.x(), grid_position.y()),
                 Transform {
                     translation: translation,
-                    scale: Vec3::splat(game_config.tile_size / 64.0),
+                    scale: Vec3::splat(game_config.tile_width / 64.0),
                     ..default()
                 },
                 PlantHealth {

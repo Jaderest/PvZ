@@ -298,3 +298,13 @@ pub fn get_shovel_imagenode(
         ..default()
     }
 }
+
+pub fn get_menu_imagenode(
+    asset_server: &AssetServer
+) -> ImageNode {
+    let image = asset_server.load("other/Menu.png");
+    ImageNode {
+        image: image,
+        ..default()
+    }
+}

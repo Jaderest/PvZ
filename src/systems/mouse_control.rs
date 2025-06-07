@@ -73,11 +73,12 @@ fn plant_click(
     mut spawn_plant_writer: EventWriter<SpawnPlantEvent>,
     mut despawn_plant_writer: EventWriter<ShovelPlantEvent>,
 ) {
-    let tile_size = game_config.tile_size;
+    let tile_width = game_config.tile_width;
+    let tile_height = game_config.tile_height;
     for (grid_position, transform) in tiles.iter() {
         let dx = (click_world_position.x - transform.translation.x).abs();
         let dy = (click_world_position.y - transform.translation.y).abs();
-        if dx < tile_size / 2.0 && dy < tile_size / 2.0 {
+        if dx < tile_width / 2.0 && dy < tile_height / 2.0 {
             match *control_state {
                 ControlState::SelectPlant => {
                     // 处理植物点击事件

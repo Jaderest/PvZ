@@ -97,7 +97,7 @@ pub fn detect_zombie_plant_collision(
             let zombie_bounding_circle = zombie_aabb.bounding_circle();
 
             let plant_center = plant_transform.translation.truncate();
-            let plant_aabb = Aabb2d::new(plant_center, Vec2::splat(game_config.tile_size / 3.0));
+            let plant_aabb = Aabb2d::new(plant_center, Vec2::splat(game_config.tile_width / 3.0));
             let plant_bounding_circle = plant_aabb.bounding_circle();
             if plant_bounding_circle.intersects(&zombie_bounding_circle) {
                 collision_event_writer.write(ZombieCollidePlantEvent {
