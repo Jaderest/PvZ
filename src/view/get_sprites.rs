@@ -48,18 +48,14 @@ pub fn get_wallnut_sprite(
     }
 }
 
-pub fn get_sun_sprite(
-    asset_server: &AssetServer,
-) -> Sprite {
+pub fn get_sun_sprite(asset_server: &AssetServer) -> Sprite {
     Sprite {
         image: asset_server.load("other/Sun.png"),
         ..default()
     }
 }
 
-pub fn get_pea_sprite(
-    asset_server: &AssetServer,
-) -> Sprite {
+pub fn get_pea_sprite(asset_server: &AssetServer) -> Sprite {
     Sprite {
         image: asset_server.load("other/ProjectilePea.png"),
         ..default()
@@ -83,7 +79,7 @@ fn get_zombie_sprite_0(
     texture_atlas_layouts: &mut Assets<TextureAtlasLayout>,
 ) -> Sprite {
     let layout = TextureAtlasLayout::from_grid(UVec2::new(166, 144), 22, 1, None, None);
-    
+
     let texture_atlas_layout = texture_atlas_layouts.add(layout);
     Sprite {
         image: asset_server.load("Zombies/Zombie.png"),
@@ -269,9 +265,7 @@ pub fn get_wallnut_card_imagenode(
     ImageNode::from_atlas_image(image, TextureAtlas::from(texture_atlas_handle))
 }
 
-pub fn get_sunbank_imagenode(
-    asset_server: &AssetServer
-) -> ImageNode {
+pub fn get_sunbank_imagenode(asset_server: &AssetServer) -> ImageNode {
     let image = asset_server.load("Cards/SunBank.png");
     ImageNode {
         image: image,
@@ -279,9 +273,7 @@ pub fn get_sunbank_imagenode(
     }
 }
 
-pub fn get_shovel_bank_imagenode(
-    asset_server: &AssetServer
-) -> ImageNode {
+pub fn get_shovel_bank_imagenode(asset_server: &AssetServer) -> ImageNode {
     let image = asset_server.load("Cards/ShovelBank.png");
     ImageNode {
         image: image,
@@ -289,9 +281,7 @@ pub fn get_shovel_bank_imagenode(
     }
 }
 
-pub fn get_shovel_imagenode(
-    asset_server: &AssetServer
-) -> ImageNode {
+pub fn get_shovel_imagenode(asset_server: &AssetServer) -> ImageNode {
     let image = asset_server.load("Cards/Shovel.png");
     ImageNode {
         image: image,
@@ -299,10 +289,24 @@ pub fn get_shovel_imagenode(
     }
 }
 
-pub fn get_menu_imagenode(
-    asset_server: &AssetServer
-) -> ImageNode {
+pub fn get_menu_imagenode(asset_server: &AssetServer) -> ImageNode {
     let image = asset_server.load("other/Menu.png");
+    ImageNode {
+        image: image,
+        ..default()
+    }
+}
+
+pub fn get_game_win_imagenode(asset_server: &AssetServer) -> ImageNode {
+    let image = asset_server.load("other/WinBackground.png");
+    ImageNode {
+        image: image,
+        ..default()
+    }
+}
+
+pub fn get_game_lose_imagenode(asset_server: &AssetServer) -> ImageNode {
+    let image = asset_server.load("other/LoseBackground.png");
     ImageNode {
         image: image,
         ..default()

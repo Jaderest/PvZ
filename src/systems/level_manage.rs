@@ -1,8 +1,8 @@
 use bevy::prelude::*;
 
-use rand::rand_core::le;
 use rand::Rng;
 
+use crate::model::events::GameWinEvent;
 use crate::model::level::*;
 use crate::model::zombie::*;
 use crate::model::zombie_events::*;
@@ -14,6 +14,7 @@ pub fn level_system(
     time: Res<Time>,
     wave_query: Query<&ZombieWave>,
     zombie_query: Query<Entity, With<Zombie>>,
+    mut game_win_event_writer: EventWriter<GameWinEvent>,
 ) {
     if !level.is_started() {
         level.start_tick(&time);
@@ -22,8 +23,7 @@ pub fn level_system(
         return;
     }
     if level.is_empty() && zombie_query.is_empty() {
-        // 胜利条件：level队列为空且场上没有僵尸
-        // 这里是胜利了，但是把胜利事件交给其他系统处理
+        game_win_event_writer.write(GameWinEvent);
     } else if !level.is_empty() && zombie_query.is_empty() {
         // 如果level队列不为空但场上没有僵尸，释放下一波僵尸
         if let Some(wave) = level.pop_front() {

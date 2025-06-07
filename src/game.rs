@@ -93,7 +93,6 @@ impl Plugin for GamePlugin {
             .add_event::<PeaHitZombieEvent>()
             .add_event::<ZombieDefenderBrokenEvent>()
             .add_systems(Update, keyboard_spawn_zombie.run_if(in_state(GameState::Game)))
-            //TODO：看一下可以并行化的部分
             .add_systems(
                 Update,
                 (
@@ -133,11 +132,11 @@ impl Plugin for GamePlugin {
             .add_systems(Update, play_pole_vaulting_jump1_animation.run_if(in_state(GameState::Game)))
             .add_systems(Update, play_pole_vaulting_jump2_animation.run_if(in_state(GameState::Game)))
             .add_systems(Update, spawn_pole_vaulting_zombie_walk.run_if(in_state(GameState::Game)))
-            // TODO: 加个背景加个草丛吧
-            // TODO: 胜利结算画面
+            // 最后是关卡设计和游戏判定
             .insert_resource(Level::level1())
             .add_systems(Update, level_system.run_if(in_state(GameState::Game)))
             .add_systems(Update, wave_system.run_if(in_state(GameState::Game)))
+            .add_systems(Update, zombie_arrive_room.run_if(in_state(GameState::Game)))
             ;
     }
 }

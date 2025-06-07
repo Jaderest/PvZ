@@ -114,7 +114,7 @@ fn sun_click(
     for (sun_entity, sun, transform) in suns.iter() {
         let dx = (click_world_position.x - transform.translation.x).abs();
         let dy = (click_world_position.y - transform.translation.y).abs();
-        if dx < sun_size / 2.0 && dy < sun_size / 2.0 {
+        if dx < sun_size && dy < sun_size {
             if mouse.just_pressed(MouseButton::Left) {
                 // Pickup sun event
                 info!(

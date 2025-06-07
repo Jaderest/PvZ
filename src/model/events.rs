@@ -1,8 +1,6 @@
 use bevy::prelude::*;
 
 use crate::model::{
-    plant::*,
-    projectile::*,
     zombie::*,
 };
 
@@ -30,3 +28,9 @@ pub struct PlantReceiveDamageEvent {
 pub struct ZombieTargetNotExistEvent {
     pub zombie: Entity,
 }
+
+#[derive(Event)]
+pub struct GameWinEvent;
+
+#[derive(Event)]
+pub struct GameLoseEvent;

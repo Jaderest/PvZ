@@ -6,7 +6,7 @@ folder_path = "C:/Users/Jade/OneDrive/桌面/"
 
 # 获取文件夹中的所有JPG图片文件
 for filename in os.listdir(folder_path):
-    if filename.endswith(".jpg"):
+    if filename.endswith(".png"):
         # 构造图片的完整路径
         img_path = os.path.join(folder_path, filename)
         
@@ -18,8 +18,8 @@ for filename in os.listdir(folder_path):
             # 计算裁剪区域：从50到150宽度（若宽度不足150则自动调整）
             left = 0
             right = min(left + 10000, width)
-            top = 0
-            bottom = height
+            top = 100
+            bottom = min(top + 905, height)
             
             # 裁剪图片
             cropped_img = img.crop((left, top, right, bottom))

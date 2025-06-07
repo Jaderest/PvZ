@@ -1,11 +1,8 @@
 use bevy::{
-    ecs::event,
-    math::bounding::{Aabb2d, BoundingCircle, BoundingVolume, IntersectsVolume},
-    prelude::*,
-    transform,
+    ecs::event, gizmos::grid, math::bounding::{Aabb2d, BoundingCircle, BoundingVolume, IntersectsVolume}, prelude::*, transform
 };
 
-use crate::model::components::*;
+use crate::{game, model::components::*};
 use crate::model::projectile::*;
 use crate::model::zombie::*;
 use crate::model::zombie_pole_vaulting::*;
@@ -291,6 +288,21 @@ pub fn zombie_attack_plant(
                     zombie_behavior
                 );
             }
+        }
+    }
+}
+
+pub fn zombie_arrive_room(
+    game_config: Res<GameConfig>,
+    zombie_query: Query<&Transform, With<Zombie>>,
+    mut game_lose_event_writer: EventWriter<GameLoseEvent>,
+) {
+    for zombie_transform in zombie_query.iter() {
+        let grid_x = pixel2gridx(*game_config, zombie_transform.translation.x);
+        if grid_x < -2.8 {
+            // 如果僵尸到达房间，触发游戏失败事件
+            game_lose_event_writer.write(GameLoseEvent);
+            return; // 只要有一个僵尸到达房间就触发游戏失败
         }
     }
 }
