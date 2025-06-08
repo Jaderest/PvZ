@@ -1,4 +1,4 @@
-use bevy::{prelude::*, scene::ron::de};
+use bevy::prelude::*;
 
 #[derive(Event, Debug)]
 pub struct PickupSunEvent {

@@ -1,4 +1,4 @@
-use bevy::{ecs::system::command::insert_resource, prelude::*};
+use bevy::prelude::*;
 
 pub struct ConfigPlugin;
 impl Plugin for ConfigPlugin {
@@ -15,8 +15,11 @@ impl Plugin for ConfigPlugin {
 #[derive(Resource, Clone, Copy)]
 pub enum GameType {
     DayTimeGrass,
+    #[allow(unused)]
     NightTimeGrass,
+    #[allow(unused)]
     DayTimeWater,
+    #[allow(unused)]
     NightTimeWater,
 }
 
@@ -58,8 +61,11 @@ impl Default for PlantType {
 
 #[derive(Resource)]
 pub struct WindowResolution {
+    // 扩展
+    #[allow(unused)]
     large: Vec2,
     medium: Vec2,
+    #[allow(unused)]
     small: Vec2,
 }
 impl Default for WindowResolution {

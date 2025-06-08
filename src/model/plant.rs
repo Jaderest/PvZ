@@ -11,7 +11,8 @@ pub struct Plant;
 pub struct PlantHealth {
     /// 当前血量
     pub current: f32,
-    /// 最大血量
+    /// 最大血量，可以实现植物恢复血量
+    #[allow(unused)]
     pub max: f32,
 }
 

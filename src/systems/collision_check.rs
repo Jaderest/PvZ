@@ -1,12 +1,13 @@
 use bevy::{
-    ecs::event, gizmos::grid, math::bounding::{Aabb2d, BoundingCircle, BoundingVolume, IntersectsVolume}, prelude::*, transform
+    math::bounding::{Aabb2d, BoundingCircle, IntersectsVolume},
+    prelude::*,
 };
 
-use crate::{game, model::components::*};
+use crate::model::components::*;
+use crate::model::events::*;
 use crate::model::projectile::*;
 use crate::model::zombie::*;
 use crate::model::zombie_pole_vaulting::*;
-use crate::model::{events::*, zombie};
 use crate::{
     config::GameConfig, model::zombie_events::ZombieDefenderBrokenEvent, view::get_sprites::*,
 };
@@ -224,7 +225,7 @@ pub fn handle_pole_vaulting_zombie_collide_plant(
                 zombie_behavior.set_to(event.zombie_behavior);
                 zombie_target.set_target(event.plant);
                 zombie_atk_timer.reset(); // 重置攻击计时器
-                
+
                 // 切换贴图和uitimer
                 commands
                     .entity(event.zombie)

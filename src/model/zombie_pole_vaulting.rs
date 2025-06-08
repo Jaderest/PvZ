@@ -21,6 +21,7 @@ pub struct ZombiePoleJump2Event {
 #[derive(Event, Debug)]
 pub struct ZombiePoleJumpEndEvent {
     pub y: u32, // 图片绘制的高度
+    // 传递僵尸血量
     pub health: ZombieHealth,
     pub translation: Vec3,
 }

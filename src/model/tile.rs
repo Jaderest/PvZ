@@ -15,9 +15,11 @@ pub struct Lawn(pub HashMap<GridPosition, Entity>);
 pub enum TileType {
     /// 草地
     Grass,
-    /// 土地
+    /// 土地，之后生成lawn的时候可以根据地图来
+    #[allow(unused)]
     Soil,
     /// 水
+    #[allow(unused)]
     Water,
 }
 

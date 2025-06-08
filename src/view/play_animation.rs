@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::config::{grid2pixel, pixel2gridx, GameConfig};
+use crate::config::*;
 use crate::model::components::UiTimer;
 use crate::model::plant::{Plant};
 use crate::model::zombie::*;

@@ -197,7 +197,7 @@ pub fn spawn_pole_vaulting_zombie_walk(
             ZombieBehavior::Walk,
             ZombieAtkTimer::default(),
             ZombieTargetPlant::default(),
-            ZombieHealth::new(100.0),
+            ZombieHealth::from_zombie_health(&event.health),
             ZombieDamage { damage: 10.0 },
             ZombieDefender::normal(),
             UiTimer::zombie_polevaulting_walk(),

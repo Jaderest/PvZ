@@ -118,6 +118,7 @@ impl ZombieHealth {
             max: health.max,
         }
     }
+    #[allow(unused)]
     pub fn current(&self) -> f32 {
         self.current
     }
@@ -166,6 +167,8 @@ impl ZombieDefender {
 
 #[derive(Component, Debug)]
 pub struct Defender {
+    // 扩展Defender比如铁桶和门板
+    #[allow(unused)]
     pub defender: DefenderType,
     pub health: f32,
 }
@@ -185,5 +188,7 @@ impl Defender {
 #[derive(Component, Debug)]
 pub enum DefenderType {
     Cone,
+    // TODO：扩展
+    #[allow(unused)]
     Bucket,
 }

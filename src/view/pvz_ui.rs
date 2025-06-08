@@ -1,7 +1,6 @@
 use bevy::prelude::*;
 
 use crate::config::*;
-use crate::model::plant;
 use crate::model::{plant_events::*, sun::SunAmount, sun_events::SunChangeEvent};
 
 use crate::view::get_sprites::*;
@@ -232,7 +231,13 @@ pub fn card(
 
 pub fn card_click_system(
     mut interaction_query: Query<
-        (Entity, &Interaction, &mut ImageNode, &PlantType, &mut CardCDTimer),
+        (
+            Entity,
+            &Interaction,
+            &mut ImageNode,
+            &PlantType,
+            &mut CardCDTimer,
+        ),
         (Changed<Interaction>, With<Button>, With<CardUI>),
     >,
     mouse: Res<ButtonInput<MouseButton>>,
@@ -240,7 +245,8 @@ pub fn card_click_system(
     mut control_state: ResMut<ControlState>,
     mut clear_card_event_writer: EventWriter<ClearCardEvent>,
 ) {
-    for (card_entity, interaction, mut image_node, card_plant_type, timer) in interaction_query.iter_mut()
+    for (card_entity, interaction, mut image_node, card_plant_type, timer) in
+        interaction_query.iter_mut()
     {
         if !timer.timer.finished() {
             // 如果卡牌还在CD中, 不处理点击事件
@@ -316,7 +322,10 @@ pub fn card_plant_event(
     mut despawn_plant_reader: EventReader<ShovelPlantEvent>,
     plant_type: Res<PlantType>,
     mut control_state: ResMut<ControlState>,
-    mut card_query: Query<(&mut ImageNode, &mut CardCDTimer, &PlantType), (With<Button>, With<CardUI>)>,
+    mut card_query: Query<
+        (&mut ImageNode, &mut CardCDTimer, &PlantType),
+        (With<Button>, With<CardUI>),
+    >,
 ) {
     for _event in suc_spawn_plant_reader.read() {
         match *control_state {
