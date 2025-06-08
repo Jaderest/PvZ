@@ -40,6 +40,7 @@ pub fn level_system(
     }
 }
 
+// 添加僵尸波到命令中
 fn add_wave(
     commands: &mut Commands,
     zombie_wave: ZombieWave, // 直接把它所有权借走
@@ -49,6 +50,7 @@ fn add_wave(
     ));
 }
 
+// 处理当前所有的wave，测试较少可能有bug？
 pub fn wave_system(
     mut commands: Commands,
     zombie_wave_query: Single<(Entity, &mut ZombieWave)>,

@@ -16,6 +16,7 @@ pub struct PlantHealth {
     pub max: f32,
 }
 
+// 开火属性，事实上改名Fire表义更合适
 #[derive(Component)]
 pub struct PeaShooter {
     pub damage: f32,
@@ -31,6 +32,7 @@ impl Default for PeaShooter {
     
 }
 
+// 产阳光属性，改名SunProducer表义更合适
 #[derive(Component)]
 pub struct Sunflower {
     pub sun_amount: u32,
@@ -45,6 +47,7 @@ impl Default for Sunflower {
     }
 }
 
+// 坚果墙标记组件
 #[derive(Component)]
 pub struct WallNut;
 

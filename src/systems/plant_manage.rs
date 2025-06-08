@@ -63,6 +63,8 @@ pub fn spawn_plant(
         suc_spawn_plant_writer.write(SuccessSpawnPlantEvent { sun_cost: *cost });
     }
 }
+
+// 辅助函数，获取tile
 fn get_tile_mut_if_valid<'a>(
     lawn: &Lawn,
     grid_position: GridPosition,

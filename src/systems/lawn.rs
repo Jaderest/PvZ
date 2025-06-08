@@ -4,6 +4,8 @@ use crate::config::*;
 use crate::model::components::GridPosition;
 use crate::model::tile::*;
 
+// 设置一个草坪系统，辅助植物系统
+// 可以扩展为其他类型的地块，比如水池、空地（不能放置植物）等
 pub fn setup_lawn(
     mut commands: Commands,
     asset_server: Res<AssetServer>,

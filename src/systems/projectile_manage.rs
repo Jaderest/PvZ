@@ -4,6 +4,7 @@ use crate::model::projectile::*;
 use crate::model::projectile_events::*;
 use crate::view::get_sprites::*;
 
+// 生成投射物豌豆
 pub fn spawn_pea(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
@@ -31,6 +32,7 @@ pub fn spawn_pea(
     }
 }
 
+// 投射物豌豆移动系统
 pub fn move_pea(
     mut pea_query: Query<(&mut Transform, &Velocity), With<Pea>>,
     time: Res<Time>,
@@ -41,6 +43,7 @@ pub fn move_pea(
     }
 }
 
+// 防止没打中僵尸的豌豆资源堆积
 pub fn time_despawn_pea(
     mut commands: Commands,
     mut pea_query: Query<(Entity, &mut ProjLife), With<Pea>>,

@@ -4,14 +4,11 @@ use crate::model::events::*;
 use crate::model::zombie::*;
 use crate::model::zombie_events::*;
 use crate::model::zombie_pole_vaulting::ZombiePoleJumpEndEvent;
-use crate::view::get_sprites::get_conehead_zombie_sprite;
-use crate::view::get_sprites::get_polevaulting_zombie_sprite;
-use crate::view::get_sprites::get_polevaulting_zombie_walk_sprite;
-use crate::view::get_sprites::get_zombie_attack_sprite;
-use crate::view::get_sprites::get_zombie_sprite;
+use crate::view::get_sprites::*;
 use bevy::prelude::*;
 use rand::Rng;
 
+// 生成僵尸
 pub fn spawn_zombie(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
@@ -52,6 +49,7 @@ pub fn spawn_zombie(
     }
 }
 
+// 生成普通僵尸实体的辅助函数
 fn spawn_zombie_entity(
     y: u32,
     commands: &mut Commands,
@@ -103,6 +101,7 @@ fn spawn_zombie_entity(
     ));
 }
 
+// 生成智障僵尸的辅助函数
 fn spawn_conehead_zombie_entity(
     y: u32,
     commands: &mut Commands,
@@ -139,6 +138,7 @@ fn spawn_conehead_zombie_entity(
     ));
 }
 
+// 生成撑杆跳僵尸实体的辅助函数
 fn spawn_pole_vaulting_zombie_entity(
     y: u32,
     commands: &mut Commands,
@@ -178,6 +178,7 @@ fn spawn_pole_vaulting_zombie_entity(
     ));
 }
 
+// 生成撑杆跳僵尸行走实体，用于跳跃结束之后生成
 pub fn spawn_pole_vaulting_zombie_walk(
     game_config: Res<GameConfig>,
     mut commands: Commands,
@@ -210,6 +211,7 @@ pub fn spawn_pole_vaulting_zombie_walk(
     }
 }
 
+// 僵尸移动系统
 pub fn zombie_move(
     mut zombie_query: Query<(&mut Transform, &ZombieSpeed, &ZombieBehavior), With<Zombie>>,
     time: Res<Time>,
@@ -221,6 +223,7 @@ pub fn zombie_move(
     }
 }
 
+// 僵尸似了
 pub fn despawn_zombie(
     mut commands: Commands,
     mut zombie_query: Query<(Entity, &ZombieHealth, &Transform), With<Zombie>>,
@@ -234,6 +237,7 @@ pub fn despawn_zombie(
     }
 }
 
+// 僵尸从攻击状态恢复，切换行为并且恢复行走
 pub fn zombie_recover_walk_system(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
@@ -269,6 +273,7 @@ pub fn zombie_recover_walk_system(
     }
 }
 
+// 撑杆跳僵尸从跳跃状态恢复行走状态，（区分几种僵尸是为了不同贴图，或许可以用宏优化）
 pub fn zombie_pole_vaulting_recover_walk_system(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
@@ -308,6 +313,7 @@ pub fn zombie_pole_vaulting_recover_walk_system(
     }
 }
 
+// 防具破碎，切换贴图
 pub fn break_zombie_defender(
     mut commands: Commands,
     asset_server: Res<AssetServer>,

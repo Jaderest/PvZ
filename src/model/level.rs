@@ -45,7 +45,7 @@ impl Default for Level {
         Level {
             waves: VecDeque::new(),
             // 开始游戏到第一波僵尸
-            start_timer: Timer::from_seconds(20.0, TimerMode::Once),
+            start_timer: Timer::from_seconds(30.0, TimerMode::Once),
             // 波之间的最长间隔
             interval_timer: Timer::from_seconds(30.0, TimerMode::Repeating),
         }

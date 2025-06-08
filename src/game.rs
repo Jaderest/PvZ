@@ -29,6 +29,8 @@ use crate::model::tile::Lawn;
 use crate::systems::lawn::setup_lawn;
 use crate::systems::mouse_control::handle_clicks;
 
+// 放到一起整理了一下系统，其实可以封装成多个插件，但是在开始编程的时候没有考虑很多结构设计
+
 pub struct GamePlugin;
 impl Plugin for GamePlugin {
     fn build(&self, app: &mut App) {

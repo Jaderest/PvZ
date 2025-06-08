@@ -7,6 +7,9 @@ use crate::model::zombie::*;
 use crate::model::zombie_pole_vaulting::*;
 use crate::view::get_sprites::*;
 
+// 播放植物和僵尸的动画
+// 这里的动画是基于Sprite的TextureAtlas来实现的
+
 pub fn play_plant_animation(
     mut plant_query: Query<(&mut Sprite, &mut UiTimer), With<Plant>>,
     time: Res<Time>,

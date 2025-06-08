@@ -13,6 +13,7 @@ use crate::{
 };
 use crate::{config::pixel2gridx, model::plant::*};
 
+// 检测豌豆子弹与僵尸的碰撞
 pub fn detect_pea_zombie_collision(
     mut pea_query: Query<(Entity, &ProjDamage, &Transform, &ProjRow, &mut Hit), With<Pea>>,
     mut zombie_query: Query<(Entity, &Transform, &ZombiePosition), With<Zombie>>,
@@ -45,10 +46,12 @@ pub fn detect_pea_zombie_collision(
     }
 }
 
+// 辅助函数
 fn pea_collision(pea: BoundingCircle, zombie: Aabb2d) -> bool {
     pea.intersects(&zombie)
 }
 
+// 僵尸被豌豆击中后的处理（这个其实应该丢到zombie_manage.rs中去，但不想改了）
 pub fn handle_pea_hit_zombie(
     mut commands: Commands,
     mut events_reader: EventReader<PeaHitZombieEvent>,
@@ -73,6 +76,7 @@ pub fn handle_pea_hit_zombie(
     }
 }
 
+// 检测僵尸与植物的碰撞
 pub fn detect_zombie_plant_collision(
     game_config: Res<GameConfig>,
     mut plant_query: Query<(Entity, &Transform, &GridPosition), With<Plant>>,
@@ -170,6 +174,7 @@ pub fn handle_zombie_collide_plant(
     }
 }
 
+// 处理撑杆僵尸与植物碰撞事件
 pub fn handle_pole_vaulting_zombie_collide_plant(
     mut commands: Commands,
     game_config: Res<GameConfig>,
@@ -241,6 +246,7 @@ pub fn handle_pole_vaulting_zombie_collide_plant(
     }
 }
 
+// 僵尸攻击植物，发送事件交给plant_manage.rs处理
 pub fn zombie_attack_plant(
     mut zombie_query: Query<
         (
@@ -293,6 +299,7 @@ pub fn zombie_attack_plant(
     }
 }
 
+// 检测僵尸是否到达底线，判定游戏失败
 pub fn zombie_arrive_room(
     game_config: Res<GameConfig>,
     zombie_query: Query<&Transform, With<Zombie>>,

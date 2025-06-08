@@ -102,6 +102,7 @@ fn plant_click(
     }
 }
 
+// 阳光收集系统
 fn sun_click(
     mut commands: Commands,
     game_config: GameConfig,

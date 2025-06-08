@@ -5,25 +5,6 @@ use crate::model::sun_events::*;
 use crate::{config::*, model::plant_events::SuccessSpawnPlantEvent};
 use crate::{model::sun::*, view::get_sprites::get_sun_sprite};
 
-pub struct SunPlugin;
-impl Plugin for SunPlugin {
-    fn build(&self, app: &mut App) {
-        // todo：注册生成阳光
-        app.insert_resource(GlobalSunTimer::default())
-            .insert_resource(SunAmount::default())
-            .add_event::<PickupSunEvent>()
-            .add_event::<SpawnFlowerSunEvent>()
-            .add_event::<SunChangeEvent>()
-            .add_systems(Update, sun_produce_sun)
-            .add_systems(Update, sun_add)
-            .add_systems(Update, sun_consume)
-            .add_systems(Update, sun_despawn_with_time)
-            .add_systems(Update, flower_produce_sun)
-            .add_systems(Update, sun_fall_system)
-            .add_systems(Update, flower_sun_fall_system);
-    }
-}
-
 /// 自然生成阳光
 pub fn sun_produce_sun(
     // mut sun_amount: ResMut<SunAmount>,
@@ -61,6 +42,7 @@ pub fn sun_produce_sun(
     }
 }
 
+// 向日葵生产阳光系统（接收事件）
 pub fn flower_produce_sun(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
@@ -90,6 +72,7 @@ pub fn flower_produce_sun(
     }
 }
 
+// 管理阳光资源
 pub fn sun_add(
     mut sun_amount: ResMut<SunAmount>,
     mut pickup_sun_reader: EventReader<PickupSunEvent>,
@@ -101,6 +84,7 @@ pub fn sun_add(
     }
 }
 
+// 消耗阳光
 pub fn sun_consume(
     mut sun_amount: ResMut<SunAmount>,
     mut suc_spawn_plant_reader: EventReader<SuccessSpawnPlantEvent>,
@@ -112,6 +96,7 @@ pub fn sun_consume(
     }
 }
 
+// 阳光自动消失，还原原游戏
 pub fn sun_despawn_with_time(
     mut commands: Commands,
     time: Res<Time>,
