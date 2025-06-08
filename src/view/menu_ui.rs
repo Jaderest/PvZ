@@ -20,7 +20,6 @@ pub fn menu_plugin(app: &mut App) {
     app.add_systems(OnEnter(GameState::Menu), main_menu_setup)
         .add_systems(Update, (menu_button_interaction, button_system).run_if(in_state(GameState::Menu)))
         .add_systems(OnExit(GameState::Menu), despawn_screen::<OnMenuScreen>)
-    // TODO: 添加一个despawn的函数，参考add_systems(OnExit(MenuState::Main), despawn_screen::<OnMainMenuScreen>)
     ;
 }
 
@@ -106,7 +105,6 @@ pub fn main_menu_setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     ));
 }
 
-// TODO: 完成这个函数之后看一下plugin的设计
 fn menu_button_interaction(
     interaction_query: Query<
         (&Interaction, &MenuButtonAction),
