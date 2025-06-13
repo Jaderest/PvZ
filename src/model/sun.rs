@@ -48,7 +48,7 @@ pub struct SunAmount(u32);
 
 impl Default for SunAmount {
     fn default() -> Self {
-        Self(1000)
+        Self(100)
     }
 }
 
